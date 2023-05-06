@@ -11,19 +11,11 @@
 #include <flood/in_stream.h>
 #include <flood/out_stream.h>
 
-int clvReqRoomJoin(ClvServer* self, const ClvAddress* address, const uint8_t* data, size_t len, FldOutStream* outStream)
+int clvReqRoomJoin(ClvServer* self, const ClvUserSession* foundUserSession, FldInStream* inStream,
+                   FldOutStream* outStream)
 {
-    FldInStream inStream;
-    fldInStreamInit(&inStream, data, len);
-
-    ClvUserSession* foundUserSession;
-    int errorCode = clvUserSessionsReadAndFind(&self->userSessions, address, &inStream, &foundUserSession);
-    if (errorCode < 0) {
-        CLOG_WARN("couldn't find user session");
-        return errorCode;
-    }
     ClvRoom* foundRoom;
-    errorCode = clvRoomsReadNameAndFind(&self->rooms, &inStream, &foundRoom);
+    int errorCode = clvRoomsReadNameAndFind(&self->rooms, inStream, &foundRoom);
     if (errorCode < 0) {
         CLOG_WARN("couldn't find room");
         return errorCode;

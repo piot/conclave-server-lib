@@ -5,7 +5,6 @@
 #include <clog/clog.h>
 #include <conclave-server/room.h>
 #include <conclave-server/room_connection.h>
-#include <conclave-server/room_connections.h>
 
 /// Creates a room connection for the specified room.
 /// @param self
@@ -27,7 +26,7 @@ static int roomCreateConnection(ClvRoom* self, const struct ClvUserSession* owne
                 CLOG_ERROR("owner is null");
             }
             roomConnection->id = i;
-            clvRoomConnectionInit(roomConnection, ownerOfConnection);
+            clvRoomConnectionInit(roomConnection, self, ownerOfConnection);
             connections->connectionCount++;
 
             *outConnection = roomConnection;
@@ -42,8 +41,17 @@ static int roomCreateConnection(ClvRoom* self, const struct ClvUserSession* owne
 
 void clvRoomDestroy(ClvRoom* self)
 {
-    //clvRoomMembersDestroy(&self->members);
+    // clvRoomMembersDestroy(&self->members);
     clvRoomConnectionsDestroy(&self->roomConnections);
+}
+
+ClvRoomConnection* clvRoomFindConnection(ClvRoom* self, uint8_t connectionIndex)
+{
+    if (connectionIndex >= self->roomConnections.connectionCount) {
+        return 0;
+    }
+
+    return &self->roomConnections.connections[connectionIndex];
 }
 
 int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foundUserSession,

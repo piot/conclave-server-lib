@@ -11,8 +11,10 @@
 
 struct ClvServer;
 struct FldOutStream;
-struct ClvAddress;
+struct FldInStream;
+struct ClvUserSession;
 
-int clvReqRoomReJoin(struct ClvServer* self, const ClvAddress* address, const uint8_t* data, size_t len, struct FldOutStream* outStream);
+int clvReqRoomReJoin(struct ClvServer* self, const struct ClvUserSession* userSession, struct FldInStream* inStream,
+                     struct FldOutStream* outStream);
 
 #endif

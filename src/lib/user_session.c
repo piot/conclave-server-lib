@@ -3,10 +3,10 @@
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 #include <clog/clog.h>
-#include <flood/in_stream.h>
 #include <conclave-server/address.h>
 #include <conclave-server/user_session.h>
 #include <conclave-server/user_sessions.h>
+#include <flood/in_stream.h>
 
 void clvUserSessionsInit(ClvUserSessions* self)
 {
@@ -25,8 +25,8 @@ void clvUserSessionsReset(ClvUserSessions* self)
 
 void clvUserSessionsDestroy(ClvUserSessions* self)
 {
-  self->userSessionCapacity = 0;
-  tc_free(self->userSessions);
+    self->userSessionCapacity = 0;
+    tc_free(self->userSessions);
 }
 
 int clvUserSessionsCreate(ClvUserSessions* sessions, struct ClvUser* user, const ClvAddress* address,
@@ -46,7 +46,7 @@ int clvUserSessionsCreate(ClvUserSessions* sessions, struct ClvUser* user, const
 }
 
 static int userSessionsFind(const ClvUserSessions* self, uint32_t id, const ClvAddress* addr,
-                            ClvUserSession** outSession)
+                            const ClvUserSession** outSession)
 {
     if (id >= self->userSessionCapacity) {
         return -2;
@@ -67,7 +67,7 @@ static int userSessionsFind(const ClvUserSessions* self, uint32_t id, const ClvA
 }
 
 int clvUserSessionsReadAndFind(const ClvUserSessions* self, const ClvAddress* address, FldInStream* stream,
-                               ClvUserSession** outSession)
+                               const ClvUserSession** outSession)
 {
     uint32_t sessionId;
     fldInStreamReadUInt32(stream, &sessionId);

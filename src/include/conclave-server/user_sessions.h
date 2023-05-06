@@ -25,6 +25,6 @@ void clvUserSessionsReset(ClvUserSessions* self);
 int clvUserSessionsCreate(ClvUserSessions* sessions, struct ClvUser* user, const ClvAddress* address,
                           struct ClvUserSession** outSession);
 int clvUserSessionsReadAndFind(const ClvUserSessions* self, const ClvAddress* address, struct FldInStream* stream,
-                               struct ClvUserSession** outSession);
+                               const struct ClvUserSession** outSession);
 
 #endif

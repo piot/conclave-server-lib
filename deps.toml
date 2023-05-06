@@ -8,10 +8,6 @@ name = 'piot/conclave-serialize-c'
 version = "*"
 
 [[dependencies]]
-name = 'piot/udp-transport'
-version = "*"
-
-[[dependencies]]
 name = 'piot/ordered-datagram-c'
 version = "*"
 
@@ -23,11 +19,9 @@ version = "*"
 name = 'piot/imprint'
 version = "*"
 
-
 [[dependencies]]
 name = 'piot/monotonic-time-c'
 version = "*"
-
 
 [[development]]
 name = 'piot/udp-server-c'

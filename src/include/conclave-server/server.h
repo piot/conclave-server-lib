@@ -8,11 +8,10 @@
 #include <conclave-server/address.h>
 #include <conclave-server/room_connection.h>
 #include <conclave-server/rooms.h>
+#include <conclave-server/transport.h>
 #include <conclave-server/user_sessions.h>
 #include <conclave-server/users.h>
 #include <stdarg.h>
-
-struct ImprintMemory;
 
 typedef struct ClvServer {
     ClvRooms rooms;
@@ -21,7 +20,7 @@ typedef struct ClvServer {
 } ClvServer;
 
 typedef struct ClvResponse {
-    struct UdpTransportOut* transportOut;
+    ClvServerSendDatagram sendDatagram;
 } ClvResponse;
 
 int clvServerInit(ClvServer* self, struct ImprintAllocator* memory);

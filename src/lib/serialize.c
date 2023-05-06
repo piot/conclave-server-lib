@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 #include <conclave-server/serialize.h>
 #include <flood/in_stream.h>
-#include <stdint.h>
 
 int clvReadString(struct FldInStream* stream, char* buf, size_t maxLength)
 {

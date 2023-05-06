@@ -9,7 +9,6 @@
 #include <flood/in_stream.h>
 #include <flood/out_stream.h>
 #include <imprint/default_setup.h>
-#include <udp-transport/udp_transport.h>
 
 #if !TORNADO_OS_WINDOWS
 #include <unistd.h>
@@ -22,7 +21,7 @@ typedef struct UdpServerSocketSendToAddress {
     UdpServerSocket* serverSocket;
 } UdpServerSocketSendToAddress;
 
-static int sendToAddress(void* self_, const uint8_t* buf, size_t count)
+static int sendToAddress(void* self_, const ClvAddress* address, const uint8_t* buf, size_t count)
 {
     UdpServerSocketSendToAddress* self = (UdpServerSocketSendToAddress*) self_;
 
@@ -48,16 +47,19 @@ int main(int argc, char* argv[])
     UdpServerSocketSendToAddress socketSendToAddress;
     socketSendToAddress.serverSocket = &daemon.socket;
 
-    UdpTransportOut transportOut;
-    transportOut.self = &socketSendToAddress;
-    transportOut.send = sendToAddress;
+    ClvServerSendDatagram sendDatagram;
+    sendDatagram.send = sendToAddress;
+    sendDatagram.self = &socketSendToAddress;
+
+    ClvResponse response;
+    response.sendDatagram = sendDatagram;
 
     ClvServer server;
 
     ImprintDefaultSetup memory;
     imprintDefaultSetupInit(&memory, 16 * 1024 * 1024);
 
-// TODO:    ConclaveSerializeVersion applicationVersion = {0x10, 0x20, 0x30};
+    // TODO:    ConclaveSerializeVersion applicationVersion = {0x10, 0x20, 0x30};
 
     Clog serverLog;
     serverLog.constantPrefix = "Server";
@@ -86,8 +88,6 @@ int main(int argc, char* argv[])
         if (errorCode < 0) {
             CLOG_WARN("problem with receive %d", errorCode);
         } else {
-            ClvResponse response;
-            response.transportOut = &transportOut;
             socketSendToAddress.sockAddrIn = &address;
 
             fldOutStreamRewind(&outStream);

@@ -27,6 +27,6 @@ int clvRoomsCreate(ClvRooms* self, const char* name, struct ClvUser* user, size_
                    struct ClvRoom** outRoom);
 int clvRoomsReadAndFind(ClvRooms* self, struct FldInStream* stream, struct ClvRoom** outRoom);
 int clvRoomsReadNameAndFind(ClvRooms* self, struct FldInStream* stream, struct ClvRoom** outRoom);
-int clvRoomsReadAndFindRoomConnection(ClvRooms* self, struct FldInStream* stream,
+int clvRoomsReadAndFindRoomConnection(ClvRooms* self, struct FldInStream* stream, const struct ClvUser* requiredUser,
                                       struct ClvRoomConnection** outRoomConnection);
 #endif

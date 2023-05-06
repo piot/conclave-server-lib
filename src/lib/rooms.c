@@ -3,12 +3,12 @@
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 #include <clog/clog.h>
+#include <conclave-serialize/serialize.h>
 #include <conclave-server/room.h>
 #include <conclave-server/room_connection.h>
-#include <conclave-server/room_connections.h>
 #include <conclave-server/rooms.h>
 #include <conclave-server/serialize.h>
-#include <conclave-serialize/serialize.h>
+#include <conclave-server/user_session.h>
 #include <flood/in_stream.h>
 #include <imprint/allocator.h>
 
@@ -32,7 +32,7 @@ void clvRoomsReset(ClvRooms* self)
             tc_free((void*) room->name);
             room->name = 0;
         }
-        ///clvRoomsDestroy(&room->members);
+        /// clvRoomsDestroy(&room->members);
         clvRoomConnectionsDestroy(&room->roomConnections);
     }
     self->count = 0;
@@ -127,7 +127,7 @@ int clvRoomsReadNameAndFind(ClvRooms* self, FldInStream* stream, ClvRoom** outSe
     return 0;
 }
 
-int clvRoomsReadAndFindRoomConnection(ClvRooms* self, FldInStream* stream,
+int clvRoomsReadAndFindRoomConnection(ClvRooms* self, FldInStream* stream, const struct ClvUser* requiredUser,
                                       struct ClvRoomConnection** outRoomConnection)
 {
     ClvRoom* session;
@@ -152,6 +152,12 @@ int clvRoomsReadAndFindRoomConnection(ClvRooms* self, FldInStream* stream,
         *outRoomConnection = 0;
         CLOG_SOFT_ERROR("no owner for this connection %hhu", roomConnectionIndex);
         return -98;
+    }
+
+    if (requiredUser != (*outRoomConnection)->owner->user) {
+        *outRoomConnection = 0;
+        CLOG_SOFT_ERROR("not allowed to access this room connection")
+        return -97;
     }
 
     return 0;

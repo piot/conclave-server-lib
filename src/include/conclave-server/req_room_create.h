@@ -8,10 +8,11 @@
 #include <conclave-server/address.h>
 
 struct ClvRooms;
-struct ClvUserSessions;
-struct FldOutStream ;
+struct ClvUserSession;
+struct FldOutStream;
+struct FldInStream;
 
-int clvReqRoomCreate(struct ClvRooms* self, const struct ClvUserSessions* userSessions, const ClvAddress* address,
-                     const uint8_t* data, size_t len, struct FldOutStream* outStream);
+int clvReqRoomCreate(struct ClvRooms* self, const struct ClvUserSession* userSession, struct FldInStream* inStream,
+                     struct FldOutStream* outStream);
 
 #endif

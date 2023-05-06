@@ -8,7 +8,8 @@
  * Initializes a member connection.
  * @param self the member connection
  */
-void clvRoomConnectionInit(ClvRoomConnection* self, const struct ClvUserSession* userSession)
+void clvRoomConnectionInit(ClvRoomConnection* self, struct ClvRoom* room, const struct ClvUserSession* userSession)
 {
     self->owner = userSession;
+    self->ownedByRoom = room;
 }

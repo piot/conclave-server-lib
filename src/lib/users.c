@@ -3,11 +3,11 @@
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 #include <clog/clog.h>
-#include <flood/in_stream.h>
 #include <conclave-server/address.h>
 #include <conclave-server/serialize.h>
 #include <conclave-server/user.h>
 #include <conclave-server/users.h>
+#include <flood/in_stream.h>
 
 /*
 int usersCreate(Users* sessions, User* user, const ClvAddress* address, User** outSession)
@@ -98,7 +98,7 @@ void clvUsersReset(ClvUsers* self)
     for (size_t i = 0; i < self->capacity; ++i) {
         ClvUser* user = &self->users[i];
         if (user->name) {
-            free((void*)user->name);
+            free((void*) user->name);
         }
         user->name = 0;
     }
@@ -108,4 +108,3 @@ void clvUsersDestroy(ClvUsers* self)
 {
     tc_free(self->users);
 }
-

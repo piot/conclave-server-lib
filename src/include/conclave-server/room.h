@@ -25,6 +25,7 @@ typedef struct ClvRoom {
 
 int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foundUserSession,
                                 struct ClvRoomConnection** outConnection);
+struct ClvRoomConnection* clvRoomFindConnection(ClvRoom* self, uint8_t connectionIndex);
 void clvRoomDebugOutput(const ClvRoom* self);
 void clvRoomDestroy(ClvRoom* self);
 
