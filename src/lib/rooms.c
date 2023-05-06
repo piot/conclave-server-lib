@@ -127,7 +127,7 @@ int clvRoomsReadNameAndFind(ClvRooms* self, FldInStream* stream, ClvRoom** outSe
     return 0;
 }
 
-int clvRoomsReadAndFindRoomConnection(ClvRooms* self, FldInStream* stream, const struct ClvUser* requiredUser,
+int clvRoomsReadAndFindRoomConnection(ClvRooms* self, FldInStream* stream, const struct ClvUserSession * requiredUserSession,
                                       struct ClvRoomConnection** outRoomConnection)
 {
     ClvRoom* session;
@@ -154,9 +154,9 @@ int clvRoomsReadAndFindRoomConnection(ClvRooms* self, FldInStream* stream, const
         return -98;
     }
 
-    if (requiredUser != (*outRoomConnection)->owner->user) {
+    if (requiredUserSession != (*outRoomConnection)->owner) {
         *outRoomConnection = 0;
-        CLOG_SOFT_ERROR("not allowed to access this room connection")
+        CLOG_SOFT_ERROR("not allowed to access this room connection ", requiredUserSession)
         return -97;
     }
 

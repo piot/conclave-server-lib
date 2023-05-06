@@ -18,7 +18,7 @@ int clvReqPacket(ClvServer* self, const ClvUserSession* userSession, FldInStream
 {
     ClvRoomConnection* foundRoomConnection;
 
-    int errorCode = clvRoomsReadAndFindRoomConnection(&self->rooms, inStream, userSession->user, &foundRoomConnection);
+    int errorCode = clvRoomsReadAndFindRoomConnection(&self->rooms, inStream, userSession, &foundRoomConnection);
     if (errorCode < 0) {
         return errorCode;
     }
@@ -51,12 +51,13 @@ int clvReqPacket(ClvServer* self, const ClvUserSession* userSession, FldInStream
 
     clvSerializeWriteCommand(&outStream, clvSerializeCmdPacketToClient, "prefix");
     fldOutStreamWriteUInt8(&outStream, foundRoomConnection->id);
+    fldOutStreamWriteUInt16(&outStream, packetOctetCount);
     fldOutStreamWriteOctets(&outStream, inStream->p, packetOctetCount);
     inStream->pos += packetOctetCount;
     inStream->p += packetOctetCount;
 
     ClvServerSendDatagram* sendDatagram = &response->sendDatagram;
-    sendDatagram->send(sendDatagram->self, &foundDestinationConnection->owner->address, inStream->p, packetOctetCount);
+    sendDatagram->send(sendDatagram->self, &foundDestinationConnection->owner->address, buf, outStream.pos);
 
     return 0;
 }

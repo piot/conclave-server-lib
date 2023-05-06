@@ -9,7 +9,7 @@
 
 struct ClvRoom;
 struct FldInStream;
-struct ClvUser;
+struct ClvUserSession;
 struct ClvRoomConnection;
 struct ImprintAllocator;
 
@@ -27,6 +27,6 @@ int clvRoomsCreate(ClvRooms* self, const char* name, struct ClvUser* user, size_
                    struct ClvRoom** outRoom);
 int clvRoomsReadAndFind(ClvRooms* self, struct FldInStream* stream, struct ClvRoom** outRoom);
 int clvRoomsReadNameAndFind(ClvRooms* self, struct FldInStream* stream, struct ClvRoom** outRoom);
-int clvRoomsReadAndFindRoomConnection(ClvRooms* self, struct FldInStream* stream, const struct ClvUser* requiredUser,
+int clvRoomsReadAndFindRoomConnection(ClvRooms* self, struct FldInStream* stream, const struct ClvUserSession* requiredUserSession,
                                       struct ClvRoomConnection** outRoomConnection);
 #endif

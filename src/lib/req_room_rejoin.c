@@ -19,7 +19,7 @@ int clvReqRoomReJoin(ClvServer* self, const struct ClvUserSession* userSession, 
 {
     ClvRoomConnection* foundRoomConnection;
 
-    int errorCode = clvRoomsReadAndFindRoomConnection(&self->rooms, inStream, userSession->user, &foundRoomConnection);
+    int errorCode = clvRoomsReadAndFindRoomConnection(&self->rooms, inStream, userSession, &foundRoomConnection);
     if (errorCode < 0) {
         return errorCode;
     }
