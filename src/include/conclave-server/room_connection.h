@@ -5,6 +5,9 @@
 #ifndef CONCLAVE_SERVER_ROOM_CONNECTION_H
 #define CONCLAVE_SERVER_ROOM_CONNECTION_H
 
+#include <stdint.h>
+#include <stddef.h>
+
 struct ClvRoomMember;
 struct ClvUserSession;
 struct ImprintAllocator;
@@ -13,7 +16,6 @@ struct ImprintAllocator;
 typedef struct ClvRoomConnection {
     uint32_t id;
     size_t memberCount;
-    size_t debugCounter;
     struct ClvRoomMember** members;
     const struct ClvUserSession* owner;
 } ClvRoomConnection;

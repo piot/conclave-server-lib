@@ -140,24 +140,20 @@ int clvRoomsReadAndFindRoomConnection(ClvRooms* self, FldInStream* stream,
     }
 
     ClvRoomConnections* connections = &session->roomConnections;
-    uint8_t participantConnectionIndex;
-    fldInStreamReadUInt8(stream, &participantConnectionIndex);
+    uint8_t roomConnectionIndex;
+    fldInStreamReadUInt8(stream, &roomConnectionIndex);
 
-    // CLOG_VERBOSE("============= <%d> read participant index", participantConnectionIndex);
-
-    if (participantConnectionIndex >= connections->capacityCount) {
+    if (roomConnectionIndex >= connections->capacityCount) {
         *outRoomConnection = 0;
         return -97;
     }
 
-    *outRoomConnection = &connections->connections[participantConnectionIndex];
+    *outRoomConnection = &connections->connections[roomConnectionIndex];
     if ((*outRoomConnection)->owner == 0) {
         *outRoomConnection = 0;
-        CLOG_SOFT_ERROR("no owner for this connection %hhu", participantConnectionIndex);
+        CLOG_SOFT_ERROR("no owner for this connection %hhu", roomConnectionIndex);
         return -98;
     }
-
-    // CLOG_INFO("== looked up connection %d", participantConnectionIndex);
 
     return 0;
 }

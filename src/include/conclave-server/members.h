@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-struct ClvParticipant;
+struct ClvRoomMember;
 
 typedef struct ClvRoomMembers {
     struct ClvRoomMember* members;
@@ -24,7 +24,7 @@ typedef struct ClvMemberJoinInfo {
 
 void clvRoomMembersInit(ClvRoomMembers* self, size_t maxCount);
 void clvRoomMembersDestroy(ClvRoomMembers* self);
-int clvRoomMembersJoin(ClvRoomMembers* self, const ClvMemberJoinInfo* joinInfo, size_t localParticipantCount,
-                        struct ClvParticipant** results);
+int clvRoomMembersJoin(ClvRoomMembers* self, const ClvMemberJoinInfo* joinInfo, size_t localMemberCount,
+                        struct ClvRoomMember** results);
 
 #endif

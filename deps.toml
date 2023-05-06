@@ -19,10 +19,15 @@ version = "*"
 name = 'piot/flood-c'
 version = "*"
 
-
 [[dependencies]]
 name = 'piot/imprint'
 version = "*"
+
+
+[[dependencies]]
+name = 'piot/monotonic-time-c'
+version = "*"
+
 
 [[development]]
 name = 'piot/udp-server-c'

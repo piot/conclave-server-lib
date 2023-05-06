@@ -6,31 +6,31 @@
 #include <conclave-server/room_member.h>
 #include <conclave-server/room_members.h>
 
-int clvRoomMembersJoin(ClvRoomMembers* self, const ClvMemberJoinInfo* joinInfo, size_t localParticipantCount,
+int clvRoomMembersJoin(ClvRoomMembers* self, const ClvMemberJoinInfo* joinInfo, size_t localMemberCount,
                         ClvRoomMember** results)
 {
-    if (self->participantCount + localParticipantCount > self->participantCapacity) {
+    if (self->memberCount + localMemberCount > self->memberCapacity) {
         CLOG_WARN("couldn't join, session is full")
         return -2;
     }
     size_t joinIndex = 0;
 
-    for (size_t i = 0; i < self->participantCapacity; ++i) {
-        struct ClvRoomMember* participant = &self->participants[i];
-        if (participant->name == 0) {
+    for (size_t i = 0; i < self->memberCapacity; ++i) {
+        struct ClvRoomMember* member = &self->members[i];
+        if (member->name == 0) {
             const ClvMemberJoinInfo* joiner = &joinInfo[joinIndex];
-            participant->name = tc_str_dup(joiner->name);
-            participant->localIndex = joiner->localIndex;
-            participant->id = ++self->lastUniqueId;
-            results[joinIndex] = participant;
+            member->name = tc_str_dup(joiner->name);
+            member->localIndex = joiner->localIndex;
+            member->id = ++self->lastUniqueId;
+            results[joinIndex] = member;
             joinIndex++;
-            if (joinIndex == localParticipantCount) {
+            if (joinIndex == localMemberCount) {
                 break;
             }
         }
     }
 
-    if (joinIndex != localParticipantCount) {
+    if (joinIndex != localMemberCount) {
         return -2;
     }
 
@@ -39,14 +39,14 @@ int clvRoomMembersJoin(ClvRoomMembers* self, const ClvMemberJoinInfo* joinInfo, 
 
 void clvRoomMembersInit(ClvRoomMembers* self, size_t maxCount)
 {
-    self->participantCapacity = maxCount;
-    self->participants = tc_malloc_type_count(ClvRoomMember, maxCount);
-    tc_mem_clear_type_n(self->participants, maxCount);
-    self->participantCount = 0;
+    self->memberCapacity = maxCount;
+    self->members = tc_malloc_type_count(ClvRoomMember, maxCount);
+    tc_mem_clear_type_n(self->members, maxCount);
+    self->memberCount = 0;
     self->lastUniqueId = 0;
 }
 
 void clvRoomMembersDestroy(ClvRoomMembers* self)
 {
-    tc_free(self->participants);
+    tc_free(self->members);
 }

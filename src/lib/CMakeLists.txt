@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(conclave-server-lib C)
+project(conclave_server_lib C)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_FLAGS "-std=c99")
@@ -21,10 +21,10 @@ set(DEPS ../../deps/)
 
 file(GLOB lib_src FOLLOW_SYMLINKS "*.c")
 
-add_library(conclave-server-lib STATIC ${lib_src})
+add_library(conclave_server_lib STATIC ${lib_src})
 
 target_compile_options(
-  conclave-server-lib
+  conclave_server_lib
   PRIVATE -Wall
           -Wextra
           -Wshadow
@@ -46,22 +46,22 @@ target_compile_options(
 
 if(COMPILER_CLANG)
   target_compile_options(
-    conclave-server-lib PRIVATE -Wmost -Weverything
+    conclave_server_lib PRIVATE -Wmost -Weverything
                                 -Werror=missing-variable-declarations)
 endif()
 
-target_include_directories(conclave-server-lib
+target_include_directories(conclave_server_lib
                            PUBLIC ${DEPS}piot/flood-c/src/include)
-target_include_directories(conclave-server-lib
+target_include_directories(conclave_server_lib
                            PUBLIC ${DEPS}piot/conclave-serialize-c/src/include)
-target_include_directories(conclave-server-lib
+target_include_directories(conclave_server_lib
                            PUBLIC ${DEPS}piot/clog/src/include)
-target_include_directories(conclave-server-lib
+target_include_directories(conclave_server_lib
                            PUBLIC ${DEPS}piot/tiny-libc/src/include)
-target_include_directories(conclave-server-lib
+target_include_directories(conclave_server_lib
                            PUBLIC ${DEPS}piot/imprint/src/include)
 
-                           target_include_directories(conclave-server-lib
+                           target_include_directories(conclave_server_lib
                            PUBLIC ${DEPS}piot/udp-transport/src/include)
 
-target_include_directories(conclave-server-lib PUBLIC ../include)
+target_include_directories(conclave_server_lib PUBLIC ../include)

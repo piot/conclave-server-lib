@@ -85,6 +85,6 @@ int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foun
 
 void clvRoomDebugOutput(const ClvRoom* self)
 {
-    CLOG_INFO("room: %16lX '%s' (members %zu, connections %zu)", self->id, self->name, 0,  //self->members.participantCount
+    CLOG_INFO("room: %16lX '%s' (members %zu, connections %zu)", self->id, self->name, 0,
               self->roomConnections.connectionCount);
 }

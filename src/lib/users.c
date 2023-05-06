@@ -103,3 +103,9 @@ void clvUsersReset(ClvUsers* self)
         user->name = 0;
     }
 }
+
+void clvUsersDestroy(ClvUsers* self)
+{
+    tc_free(self->users);
+}
+

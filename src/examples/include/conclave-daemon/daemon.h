@@ -2,16 +2,17 @@
  *  Copyright (c) Peter Bjorklund. All rights reserved.
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-#ifndef CONCLAVE_SERVER_ROOM_MEMBER_H
-#define CONCLAVE_SERVER_ROOM_MEMBER_H
+#ifndef CONCLAVE_DAEMON_DAEMON_H
+#define CONCLAVE_DAEMON_DAEMON_H
 
-#include <stdlib.h>
+#include <conclave-server/server.h>
+#include <udp-server/udp_server.h>
 
-typedef struct ClvRoomMember {
-    size_t localIndex;
-    size_t id;
-    const char* name;
-    size_t memberIndex;
-} ClvRoomMember;
+typedef struct ClvDaemon {
+    ClvServer server;
+    UdpServerSocket socket;
+} ClvDaemon;
+
+int clvDaemonInit(ClvDaemon* self);
 
 #endif

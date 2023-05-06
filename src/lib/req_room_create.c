@@ -55,7 +55,7 @@ int clvReqRoomCreate(ClvRooms* self, const ClvUserSessions* userSessions, const 
         const ClvRoomMember* sourceRoom = createdConnection->members[i];
         members[i].id = sourceRoom->id;
         members[i].localIndex = sourceRoom->localIndex;
-        CLOG_INFO("joining participant id:%zu localIndex:%zu", sourceRoom->id, sourceRoom->localIndex)
+        CLOG_INFO("joining member id:%zu localIndex:%zu", sourceRoom->id, sourceRoom->localIndex)
     }
 
     return clvSerializeServerOutRoomCreate(outStream, roomId, createdConnection->id, members,

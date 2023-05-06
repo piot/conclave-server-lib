@@ -11,9 +11,9 @@
 struct ClvRoomMember;
 
 typedef struct ClvRoomMembers {
-    struct ClvRoomMember* participants;
-    size_t participantCapacity;
-    size_t participantCount;
+    struct ClvRoomMember* members;
+    size_t memberCapacity;
+    size_t memberCount;
     uint8_t lastUniqueId;
 } ClvRoomMembers;
 
@@ -24,7 +24,7 @@ typedef struct ClvMemberJoinInfo {
 
 void clvRoomMembersInit(ClvRoomMembers* self, size_t maxCount);
 void clvRoomMembersDestroy(ClvRoomMembers* self);
-int clvRoomMembersJoin(ClvRoomMembers* self, const ClvMemberJoinInfo* joinInfo, size_t localParticipantCount,
+int clvRoomMembersJoin(ClvRoomMembers* self, const ClvMemberJoinInfo* joinInfo, size_t localMemberCount,
                         struct ClvRoomMember** results);
 
 #endif

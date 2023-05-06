@@ -44,11 +44,6 @@ int clvReqRoomReJoin(ClvServer* self, const ClvAddress* address, const uint8_t* 
 
     ClvSerializeGameState outGameState;
 
-    CLOG_DEBUG("rejoined room %lu", room->id);
-
-    CLOG_DEBUG("server: rejoined room %lu with blobStreamChannel %02X octetCount:%u", room->id,
-               foundRoomConnection->blobStreamOutChannel, outGameState.gameStateOctetCount);
-
     clvSerializeWriteCommand(outStream, clvSerializeCmdRoomReJoinResponse, "ServerOut");
 
     // TODO: send connection and member Ids
