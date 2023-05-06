@@ -3,7 +3,6 @@
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 #include <clog/clog.h>
-#include <conclave-server/members.h>
 #include <conclave-server/room.h>
 #include <conclave-server/room_connection.h>
 #include <conclave-server/room_connections.h>

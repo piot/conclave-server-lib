@@ -7,7 +7,6 @@
 #include <conclave-serialize/commands.h>
 #include <conclave-serialize/debug.h>
 #include <conclave-server/address.h>
-#include <conclave-server/room_member.h>
 #include <conclave-server/req_room_create.h>
 #include <conclave-server/req_room_join.h>
 #include <conclave-server/req_room_rejoin.h>

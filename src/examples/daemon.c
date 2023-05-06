@@ -11,5 +11,5 @@ int clvDaemonInit(ClvDaemon* self)
         return err;
     }
 
-    return udpServerInit(&self->socket, 27003, false);
+    return udpServerInit(&self->socket, 27003, true);
 }

@@ -4,17 +4,15 @@
  *--------------------------------------------------------------------------------------------*/
 #include <clog/clog.h>
 #include <conclave-serialize/server_out.h>
+#include <conclave-serialize/types.h>
 #include <conclave-server/req_room_create.h>
 #include <conclave-server/room.h>
 #include <conclave-server/room_connection.h>
-#include <conclave-server/room_join.h>
-#include <conclave-server/room_member.h>
 #include <conclave-server/rooms.h>
 #include <conclave-server/serialize.h>
 #include <conclave-server/server.h>
 #include <conclave-server/user_session.h>
 #include <conclave-server/user_sessions.h>
-#include <conclave-serialize/types.h>
 #include <flood/in_stream.h>
 #include <flood/out_stream.h>
 #include <tiny-libc/tiny_libc.h>
@@ -44,20 +42,12 @@ int clvReqRoomCreate(ClvRooms* self, const ClvUserSessions* userSessions, const 
 
     CLOG_INFO("room create handle %d '%s' %d", roomId, name, numberOfPlayers)
     ClvRoomConnection* createdConnection;
-    errorCode = clvReadAndJoinMembers(createdRoom, foundUserSession, &inStream, &createdConnection);
+
+    errorCode = clvRoomCreateRoomConnection(createdRoom, foundUserSession, &createdConnection);
     if (errorCode < 0) {
-        CLOG_WARN("couldn't find game session")
+        CLOG_WARN("couldn't join game session")
         return errorCode;
     }
 
-    ClvSerializeMember members[8];
-    for (size_t i = 0; i < createdConnection->memberCount; ++i) {
-        const ClvRoomMember* sourceRoom = createdConnection->members[i];
-        members[i].id = sourceRoom->id;
-        members[i].localIndex = sourceRoom->localIndex;
-        CLOG_INFO("joining member id:%zu localIndex:%zu", sourceRoom->id, sourceRoom->localIndex)
-    }
-
-    return clvSerializeServerOutRoomCreate(outStream, roomId, createdConnection->id, members,
-                                           createdConnection->memberCount);
+    return clvSerializeServerOutRoomCreate(outStream, roomId, createdConnection->id);
 }

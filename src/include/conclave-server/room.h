@@ -5,7 +5,6 @@
 #ifndef CONCLAVE_SERVER_ROOM_H
 #define CONCLAVE_SERVER_ROOM_H
 
-#include <conclave-server/members.h>
 #include <conclave-server/room_connections.h>
 
 struct ClvUser;
@@ -25,7 +24,6 @@ typedef struct ClvRoom {
 } ClvRoom;
 
 int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foundUserSession,
-                                const ClvMemberJoinInfo* joinInfo, size_t localMemberCount,
                                 struct ClvRoomConnection** outConnection);
 void clvRoomDebugOutput(const ClvRoom* self);
 void clvRoomDestroy(ClvRoom* self);

@@ -15,7 +15,6 @@
 /// @param outConnection
 /// @return error code
 static int roomCreateConnection(ClvRoom* self, const struct ClvUserSession* ownerOfConnection,
-                                const ClvMemberJoinInfo* joinInfo, size_t localRoomCount,
                                 ClvRoomConnection** outConnection)
 {
     ClvRoomConnections* connections = &self->roomConnections;
@@ -23,20 +22,12 @@ static int roomCreateConnection(ClvRoom* self, const struct ClvUserSession* owne
     for (size_t i = 0; i < connections->capacityCount; ++i) {
         ClvRoomConnection* roomConnection = &connections->connections[i];
         if (roomConnection->owner == 0) {
-            struct ClvRoomMember* createdMembers[16];
-            /*
-            int errorCode = clvRoomMembersJoin(&self->members, joinInfo, localRoomCount, createdMembers);
-            if (errorCode < 0) {
-                *outConnection = 0;
-                return errorCode;
-            }
-            */
             roomConnection->owner = ownerOfConnection;
             if (ownerOfConnection == 0) {
                 CLOG_ERROR("owner is null");
             }
             roomConnection->id = i;
-            clvRoomConnectionInit(roomConnection, self->allocator, 2 * 1024, createdMembers, localRoomCount);
+            clvRoomConnectionInit(roomConnection, ownerOfConnection);
             connections->connectionCount++;
 
             *outConnection = roomConnection;
@@ -56,7 +47,6 @@ void clvRoomDestroy(ClvRoom* self)
 }
 
 int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foundUserSession,
-   const ClvMemberJoinInfo* joinInfo, size_t localMemberCount,
                                 ClvRoomConnection** outConnection)
 {
     if (foundUserSession == 0) {
@@ -74,7 +64,7 @@ int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foun
         return 0;
     }
 
-    errorCode = roomCreateConnection(self, foundUserSession, joinInfo, localMemberCount, outConnection);
+    errorCode = roomCreateConnection(self, foundUserSession, outConnection);
     if (errorCode < 0) {
         *outConnection = 0;
         return errorCode;

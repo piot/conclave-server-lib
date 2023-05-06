@@ -6,8 +6,6 @@
 #include <conclave-serialize/server_out.h>
 #include <conclave-server/req_room_join.h>
 #include <conclave-server/room.h>
-#include <conclave-server/room_join.h>
-#include <conclave-server/room_member.h>
 #include <conclave-server/server.h>
 #include <conclave-server/user_session.h>
 #include <flood/in_stream.h>
@@ -31,22 +29,15 @@ int clvReqRoomJoin(ClvServer* self, const ClvAddress* address, const uint8_t* da
         return errorCode;
     }
     ClvRoomConnection* createdConnection;
-    errorCode = clvReadAndJoinMembers(foundRoom, foundUserSession, &inStream, &createdConnection);
+
+    errorCode = clvRoomCreateRoomConnection(foundRoom, foundUserSession, &createdConnection);
     if (errorCode < 0) {
-        CLOG_WARN("couldn't find game session");
+        CLOG_WARN("couldn't join room")
         return errorCode;
     }
 
-    ClvSerializeMember members[8];
-    for (size_t i = 0; i < createdConnection->memberCount; ++i) {
-        const ClvRoomMember* sourceMember = createdConnection->members[i];
-        members[i].id = sourceMember->id;
-        members[i].localIndex = sourceMember->localIndex;
-    }
-
     CLOG_DEBUG("joined room %lu", foundRoom->id);
-    clvSerializeServerOutRoomJoin(outStream, foundRoom->id, createdConnection->id, members,
-                                  createdConnection->memberCount);
+    clvSerializeServerOutRoomJoin(outStream, foundRoom->id, createdConnection->id);
 
     return 0;
 }
