@@ -12,6 +12,7 @@ struct FldInStream;
 struct ClvUserSession;
 struct ClvRoomConnection;
 struct ImprintAllocator;
+struct ClvUser;
 
 typedef struct ClvRooms {
     struct ClvRoom* rooms;
