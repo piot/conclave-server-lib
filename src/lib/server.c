@@ -6,12 +6,12 @@
 #include <conclave-serialize/commands.h>
 #include <conclave-serialize/debug.h>
 #include <conclave-server/address.h>
+#include <conclave-server/req_list_rooms.h>
 #include <conclave-server/req_packet.h>
 #include <conclave-server/req_room_create.h>
 #include <conclave-server/req_room_join.h>
 #include <conclave-server/req_room_rejoin.h>
 #include <conclave-server/req_user_login.h>
-#include <conclave-server/req_list_rooms.h>
 #include <conclave-server/room.h>
 #include <conclave-server/rooms.h>
 #include <conclave-server/server.h>
@@ -22,7 +22,7 @@
 
 int clvServerFeed(ClvServer* self, const ClvAddress* address, const uint8_t* data, size_t len, ClvResponse* response)
 {
-    CLOG_VERBOSE("clvServerFeed: feed: %s octetCount: %zu", clvSerializeCmdToString(data[0]), len)
+    // CLOG_VERBOSE("clvServerFeed: feed: %s octetCount: %zu", clvSerializeCmdToString(data[0]), len)
 #define UDP_MAX_SIZE (1200)
     static uint8_t buf[UDP_MAX_SIZE];
     FldOutStream outStream;

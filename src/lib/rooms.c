@@ -105,12 +105,11 @@ int clvRoomsReadAndFind(ClvRooms* self, FldInStream* stream, ClvRoom** outSessio
         return errorCode;
     }
 
-    CLOG_VERBOSE("Found room %d", roomId);
     return 0;
 }
 
-
-int clvRoomsReadAndFindRoomConnection(ClvRooms* self, FldInStream* stream, const struct ClvUserSession * requiredUserSession,
+int clvRoomsReadAndFindRoomConnection(ClvRooms* self, FldInStream* stream,
+                                      const struct ClvUserSession* requiredUserSession,
                                       struct ClvRoomConnection** outRoomConnection)
 {
     ClvRoom* session;

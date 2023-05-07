@@ -78,7 +78,5 @@ int clvUserSessionsReadAndFind(const ClvUserSessions* self, const ClvAddress* ad
         return errorCode;
     }
 
-    CLOG_DEBUG("found user session %d", sessionId);
-
     return 0;
 }
