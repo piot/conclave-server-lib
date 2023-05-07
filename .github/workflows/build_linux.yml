@@ -41,6 +41,7 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: conclave_server_lib Linux Library
+          name: conclave_server_lib and daemon Linux files
           path: |
             src/lib/libconclave_server_lib.a
+            src/example/conclave_daemon
