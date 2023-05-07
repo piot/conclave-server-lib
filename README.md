@@ -19,5 +19,6 @@ int clvServerInit(ClvServer* self, struct ImprintAllocator* memory);
 For each packet received from a `sockaddr_in`, call `clvServerFeed()`:
 
 ```c
-int clvServerFeed(ClvServer* self, const ClvAddress* address, const uint8_t* data, size_t len, ClvResponse* response);
+int clvServerFeed(ClvServer* self, const ClvAddress* address, const uint8_t* data,
+                  size_t len, ClvResponse* response);
 ```
