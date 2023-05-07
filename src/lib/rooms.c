@@ -109,22 +109,6 @@ int clvRoomsReadAndFind(ClvRooms* self, FldInStream* stream, ClvRoom** outSessio
     return 0;
 }
 
-int clvRoomsReadNameAndFind(ClvRooms* self, FldInStream* stream, ClvRoom** outSession)
-{
-    char name[64];
-    int errorCode = clvSerializeReadString(stream, name, 64);
-    if (errorCode < 0) {
-        return errorCode;
-    }
-
-    errorCode = roomsFindByName(self, name, outSession);
-    if (errorCode < 0) {
-        CLOG_WARN("couldn't find room with name '%s'", name);
-        return errorCode;
-    }
-
-    return 0;
-}
 
 int clvRoomsReadAndFindRoomConnection(ClvRooms* self, FldInStream* stream, const struct ClvUserSession * requiredUserSession,
                                       struct ClvRoomConnection** outRoomConnection)
