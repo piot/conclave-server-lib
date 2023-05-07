@@ -2,13 +2,17 @@
  *  Copyright (c) Peter Bjorklund. All rights reserved.
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-#ifndef CONCLAVE_SERVER_SERIALIZE2_H
-#define CONCLAVE_SERVER_SERIALIZE2_H
+#ifndef CONCLAVE_SERVER_REQ_LIST_ROOMS_H
+#define CONCLAVE_SERVER_REQ_LIST_ROOMS_H
 
-#include <stddef.h>
+#include <stdint.h>
 
+struct ClvServer;
+struct FldOutStream;
 struct FldInStream;
+struct ClvUserSession;
 
-int clvReadString(struct FldInStream* stream, char* buf, size_t maxLength);
+int clvReqListRooms(struct ClvServer* self, const struct ClvUserSession* foundUserSession, struct FldInStream* inStream,
+                    struct FldOutStream* outStream);
 
 #endif

@@ -11,6 +11,7 @@
 #include <conclave-server/req_room_join.h>
 #include <conclave-server/req_room_rejoin.h>
 #include <conclave-server/req_user_login.h>
+#include <conclave-server/req_list_rooms.h>
 #include <conclave-server/room.h>
 #include <conclave-server/rooms.h>
 #include <conclave-server/server.h>
@@ -48,6 +49,9 @@ int clvServerFeed(ClvServer* self, const ClvAddress* address, const uint8_t* dat
                     break;
                 case clvSerializeCmdRoomReJoin:
                     result = clvReqRoomReJoin(self, foundUserSession, &inStream, &outStream);
+                    break;
+                case clvSerializeCmdListRooms:
+                    result = clvReqListRooms(self, foundUserSession, &inStream, &outStream);
                     break;
                 case clvSerializeCmdPacket:
                     return clvReqPacket(self, foundUserSession, &inStream, response);

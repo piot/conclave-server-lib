@@ -8,7 +8,6 @@
 #include <conclave-server/room.h>
 #include <conclave-server/room_connection.h>
 #include <conclave-server/rooms.h>
-#include <conclave-server/serialize.h>
 #include <conclave-server/user_session.h>
 #include <flood/in_stream.h>
 #include <flood/out_stream.h>
@@ -19,7 +18,7 @@ int clvReqRoomCreate(ClvRooms* self, const ClvUserSession* foundUserSession, Fld
     char name[64];
     uint8_t numberOfPlayers;
     uint8_t flags;
-    clvReadString(inStream, name, 64);
+    clvSerializeReadString(inStream, name, 64);
     fldInStreamReadUInt8(inStream, &numberOfPlayers);
     fldInStreamReadUInt8(inStream, &flags);
 

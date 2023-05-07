@@ -7,7 +7,6 @@
 #include <conclave-server/room.h>
 #include <conclave-server/room_connection.h>
 #include <conclave-server/rooms.h>
-#include <conclave-server/serialize.h>
 #include <conclave-server/user_session.h>
 #include <flood/in_stream.h>
 #include <imprint/allocator.h>
@@ -113,7 +112,7 @@ int clvRoomsReadAndFind(ClvRooms* self, FldInStream* stream, ClvRoom** outSessio
 int clvRoomsReadNameAndFind(ClvRooms* self, FldInStream* stream, ClvRoom** outSession)
 {
     char name[64];
-    int errorCode = clvReadString(stream, name, 64);
+    int errorCode = clvSerializeReadString(stream, name, 64);
     if (errorCode < 0) {
         return errorCode;
     }

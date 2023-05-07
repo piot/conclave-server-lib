@@ -4,10 +4,10 @@
  *--------------------------------------------------------------------------------------------*/
 #include <clog/clog.h>
 #include <conclave-server/address.h>
-#include <conclave-server/serialize.h>
 #include <conclave-server/user.h>
 #include <conclave-server/users.h>
 #include <flood/in_stream.h>
+#include <conclave-serialize/serialize.h>
 
 /*
 int usersCreate(Users* sessions, User* user, const ClvAddress* address, User** outSession)
@@ -67,7 +67,7 @@ static int usersFind(const Users* self, uint32_t id, const ClvAddress* addr, Use
 int clvUsersReadLogin(const ClvUsers* self, const ClvAddress* address, FldInStream* stream, ClvUser** outUser)
 {
     char nameBuf[33];
-    int errorCode = clvReadString(stream, nameBuf, 33);
+    int errorCode = clvSerializeReadString(stream, nameBuf, 33);
     if (errorCode < 0) {
         return errorCode;
     }
