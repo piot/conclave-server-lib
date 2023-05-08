@@ -45,7 +45,7 @@ void clvRoomsDestroy(ClvRooms* self)
     }
 }
 
-int clvRoomsCreate(ClvRooms* self, const char* name, struct ClvUser* user, size_t maxNumberOfMembers,
+int clvRoomsCreate(ClvRooms* self, const char* name, const struct ClvUser* user, size_t maxNumberOfMembers,
                    ClvRoom** outSession)
 {
     for (size_t i = 1; i < self->capacity; ++i) {
@@ -53,7 +53,7 @@ int clvRoomsCreate(ClvRooms* self, const char* name, struct ClvUser* user, size_
         if (room->name == 0) {
             Clog roomLog;
             roomLog.config = self->log.config;
-            tc_snprintf(room->prefix, 32, "%s/room/%d", self->log.constantPrefix, i);
+            tc_snprintf(room->prefix, 32, "%s/%d", self->log.constantPrefix, i);
             roomLog.constantPrefix = room->prefix;
             clvRoomInit(room, i, name, user, maxNumberOfMembers, roomLog);
             CLOG_C_INFO(&self->log, "created room %d", i);
@@ -67,7 +67,7 @@ int clvRoomsCreate(ClvRooms* self, const char* name, struct ClvUser* user, size_
     return -1;
 }
 
-static inline int roomsFind(ClvRooms* self, size_t index, ClvRoom** outSession)
+static inline int roomsFind(ClvRooms* self, ClvSerializeRoomId index, ClvRoom** outSession)
 {
     if (index > self->capacity) {
         *outSession = 0;
@@ -79,24 +79,10 @@ static inline int roomsFind(ClvRooms* self, size_t index, ClvRoom** outSession)
     return 0;
 }
 
-static inline int roomsFindByName(ClvRooms* self, const char* name, ClvRoom** outRoom)
-{
-    for (size_t i = 0; i < self->capacity; ++i) {
-        ClvRoom* room = &self->rooms[i];
-        if (room->name && tc_str_equal(room->name, name)) {
-            *outRoom = room;
-            return 0;
-        }
-    }
-
-    *outRoom = 0;
-
-    return -1;
-}
 
 int clvRoomsReadAndFind(ClvRooms* self, FldInStream* stream, ClvRoom** outSession)
 {
-    uint32_t roomId;
+    ClvSerializeRoomId roomId;
 
     clvSerializeReadRoomId(stream, &roomId);
     int errorCode = roomsFind(self, roomId, outSession);

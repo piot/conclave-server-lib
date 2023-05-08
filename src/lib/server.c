@@ -77,15 +77,15 @@ int clvServerInit(ClvServer* self, struct ImprintAllocator* memory, Clog log)
     Clog subLog;
     subLog.config = log.config;
 
-    tc_snprintf(self->rooms.prefix, 32, "%s/room", log.constantPrefix);
+    tc_snprintf(self->rooms.prefix, 32, "%s/rooms", log.constantPrefix);
     subLog.constantPrefix = self->rooms.prefix;
     clvRoomsInit(&self->rooms, memory, subLog);
 
-    tc_snprintf(self->userSessions.prefix, 32, "%s/usersession", log.constantPrefix);
+    tc_snprintf(self->userSessions.prefix, 32, "%s/usersessions", log.constantPrefix);
     subLog.constantPrefix = self->userSessions.prefix;
     clvUserSessionsInit(&self->userSessions, subLog);
 
-    tc_snprintf(self->users.prefix, 32, "%s/user", log.constantPrefix);
+    tc_snprintf(self->users.prefix, 32, "%s/users", log.constantPrefix);
     subLog.constantPrefix = self->users.prefix;
     clvUsersInit(&self->users, subLog);
 

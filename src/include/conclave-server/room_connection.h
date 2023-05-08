@@ -5,6 +5,7 @@
 #ifndef CONCLAVE_SERVER_ROOM_CONNECTION_H
 #define CONCLAVE_SERVER_ROOM_CONNECTION_H
 
+#include <conclave-serialize/types.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -14,7 +15,7 @@ struct ClvRoom;
 
 /** Represents a unreliable datagram transport "connection" from a client */
 typedef struct ClvRoomConnection {
-    uint32_t id;
+    ClvSerializeRoomId id;
     const struct ClvUserSession* owner;
     struct ClvRoom* ownedByRoom;
 } ClvRoomConnection;

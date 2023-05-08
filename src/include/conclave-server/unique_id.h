@@ -2,12 +2,15 @@
  *  Copyright (c) Peter Bjorklund. All rights reserved.
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-#include <conclave-server/user_session.h>
+#ifndef CONCLAVE_SERVER_UNIQUE_ID_H
+#define CONCLAVE_SERVER_UNIQUE_ID_H
 
-void clvUserSessionInit(ClvUserSession* self, ClvSerializeUserSessionId id, const ClvAddress* address, const struct ClvUser* owner, Clog log)
-{
-    self->log = log;
-    self->userSessionId = id;
-    self->address = *address;
-    self->user = owner;
-}
+#include <stdint.h>
+#include <stddef.h>
+
+typedef uint64_t ClvUniqueId;
+
+ClvUniqueId clvGenerateUniqueIdFromIndex(size_t index);
+size_t clvUniqueIdGetIndex(ClvUniqueId uniqueIndex);
+
+#endif

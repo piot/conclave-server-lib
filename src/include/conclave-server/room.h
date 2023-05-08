@@ -13,10 +13,11 @@ struct ClvUserSession;
 struct ClvRoomConnection;
 struct ImprintAllocator;
 
+#include <conclave-serialize/types.h>
 #include <stdlib.h>
 
 typedef struct ClvRoom {
-    uint64_t id;
+    ClvSerializeRoomId id;
     const char* name;
     const char* passcode;
     const struct ClvUser* ownedByUser;

@@ -27,13 +27,13 @@ int clvReqUserLogin(ClvServer* self, const ClvAddress* address, const uint8_t* d
     }
 
     ClvUserSession* foundSession;
-    int sessionId = clvUserSessionsCreate(&self->userSessions, foundUser, address, &foundSession);
-    if (sessionId < 0) {
-        return sessionId;
+    int err = clvUserSessionsCreate(&self->userSessions, foundUser, address, &foundSession);
+    if (err < 0) {
+        return err;
     }
 
-    CLOG_C_DEBUG(&self->log, "logged in user '%s' and created user session %d", foundUser->name, sessionId);
+    CLOG_C_DEBUG(&self->log, "logged in user '%s' and created user session %016lX", foundUser->name, foundSession->userSessionId);
 
-    clvSerializeServerOutLogin(outStream, sessionId);
+    clvSerializeServerOutLogin(outStream, foundSession->userSessionId);
     return 0;
 }

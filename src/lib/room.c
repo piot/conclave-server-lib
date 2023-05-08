@@ -41,7 +41,6 @@ static int roomCreateConnection(ClvRoom* self, const struct ClvUserSession* owne
 
 void clvRoomDestroy(ClvRoom* self)
 {
-    // clvRoomMembersDestroy(&self->members);
     clvRoomConnectionsDestroy(&self->roomConnections);
 }
 
