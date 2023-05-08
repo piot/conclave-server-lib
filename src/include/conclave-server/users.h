@@ -16,9 +16,11 @@ typedef struct ClvUsers {
     struct ClvUser* users;
     size_t capacity;
     size_t count;
+    char prefix[32];
+    Clog log;
 } ClvUsers;
 
-void clvUsersInit(ClvUsers* self);
+void clvUsersInit(ClvUsers* self, Clog log);
 void clvUsersReset(ClvUsers* self);
 void clvUsersDestroy(ClvUsers* self);
 int clvUsersCreate(ClvUsers* sessions, struct ClvUser* user, const ClvAddress* address, struct ClvUser** outUser);

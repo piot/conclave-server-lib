@@ -17,9 +17,11 @@ typedef struct ClvUserSessions {
     struct ClvUserSession* userSessions;
     size_t userSessionCapacity;
     size_t userSessionCount;
+    Clog log;
+    char prefix[32];
 } ClvUserSessions;
 
-void clvUserSessionsInit(ClvUserSessions* self);
+void clvUserSessionsInit(ClvUserSessions* self, Clog log);
 void clvUserSessionsDestroy(ClvUserSessions* self);
 void clvUserSessionsReset(ClvUserSessions* self);
 int clvUserSessionsCreate(ClvUserSessions* sessions, struct ClvUser* user, const ClvAddress* address,

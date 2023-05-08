@@ -28,12 +28,12 @@ int clvReqRoomCreate(ClvRooms* self, const ClvUserSession* foundUserSession, Fld
         return roomId;
     }
 
-    CLOG_INFO("room create handle %d '%s' %d", roomId, name, numberOfPlayers)
+    CLOG_C_INFO(&self->log, "room create handle %d '%s' %d", roomId, name, numberOfPlayers)
     ClvRoomConnection* createdConnection;
 
     int errorCode = clvRoomCreateRoomConnection(createdRoom, foundUserSession, &createdConnection);
     if (errorCode < 0) {
-        CLOG_WARN("couldn't join game session")
+        CLOG_C_WARN(&self->log, "couldn't creat room connection")
         return errorCode;
     }
 

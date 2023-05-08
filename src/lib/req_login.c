@@ -32,7 +32,7 @@ int clvReqUserLogin(ClvServer* self, const ClvAddress* address, const uint8_t* d
         return sessionId;
     }
 
-    CLOG_DEBUG("logged in user '%s' and created user session %d", foundUser->name, sessionId);
+    CLOG_C_DEBUG(&self->log, "logged in user '%s' and created user session %d", foundUser->name, sessionId);
 
     clvSerializeServerOutLogin(outStream, sessionId);
     return 0;

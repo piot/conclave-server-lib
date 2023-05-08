@@ -6,6 +6,7 @@
 #define CONCLAVE_SERVER_ROOMS_H
 
 #include <stdlib.h>
+#include <clog/clog.h>
 
 struct ClvRoom;
 struct FldInStream;
@@ -19,9 +20,11 @@ typedef struct ClvRooms {
     size_t capacity;
     size_t count;
     struct ImprintAllocator* pageAllocator;
+    char prefix[32];
+    Clog log;
 } ClvRooms;
 
-void clvRoomsInit(ClvRooms* self, struct ImprintAllocator* allocator);
+void clvRoomsInit(ClvRooms* self, struct ImprintAllocator* allocator, Clog log);
 void clvRoomsReset(ClvRooms* self);
 void clvRoomsDestroy(ClvRooms* self);
 int clvRoomsCreate(ClvRooms* self, const char* name, struct ClvUser* user, size_t maxRoomCount,

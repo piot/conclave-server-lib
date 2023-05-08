@@ -8,8 +8,9 @@
 #include <conclave-server/user_sessions.h>
 #include <flood/in_stream.h>
 
-void clvUserSessionsInit(ClvUserSessions* self)
+void clvUserSessionsInit(ClvUserSessions* self, Clog log)
 {
+    self->log = log;
     self->userSessionCapacity = 1024;
     self->userSessions = tc_malloc_type_count(ClvUserSession, self->userSessionCapacity);
     tc_mem_clear_type_n(self->userSessions, self->userSessionCapacity);
@@ -55,8 +56,8 @@ static int userSessionsFind(const ClvUserSessions* self, uint32_t id, const ClvA
     ClvUserSession* foundSession = &self->userSessions[id];
     if (!clvAddressEqual(addr, &foundSession->address)) {
         char addrTemp[64];
-        CLOG_SOFT_ERROR("wrong address %s vs %s", clvAddressToString(addr, addrTemp, 64),
-                        clvAddressToString(&foundSession->address, addrTemp, 64));
+        CLOG_C_SOFT_ERROR(&self->log, "wrong address %s vs %s", clvAddressToString(addr, addrTemp, 64),
+                          clvAddressToString(&foundSession->address, addrTemp, 64));
         *outSession = 0;
         return -3;
     }
@@ -74,7 +75,7 @@ int clvUserSessionsReadAndFind(const ClvUserSessions* self, const ClvAddress* ad
 
     int errorCode = userSessionsFind(self, sessionId, address, outSession);
     if (errorCode < 0) {
-        CLOG_WARN("couldn't find user session %d", sessionId);
+        CLOG_C_WARN(&self->log, "couldn't find user session %d", sessionId);
         return errorCode;
     }
 

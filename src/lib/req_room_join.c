@@ -17,18 +17,18 @@ int clvReqRoomJoin(ClvServer* self, const ClvUserSession* foundUserSession, FldI
     ClvRoom* foundRoom;
     int errorCode = clvRoomsReadAndFind(&self->rooms, inStream, &foundRoom);
     if (errorCode < 0) {
-        CLOG_WARN("couldn't find room");
+        CLOG_C_WARN(&self->log, "couldn't find room");
         return errorCode;
     }
     ClvRoomConnection* createdConnection;
 
     errorCode = clvRoomCreateRoomConnection(foundRoom, foundUserSession, &createdConnection);
     if (errorCode < 0) {
-        CLOG_WARN("couldn't join room")
+        CLOG_C_WARN(&self->log, "couldn't join room")
         return errorCode;
     }
 
-    CLOG_DEBUG("joined room %lu", foundRoom->id);
+    CLOG_C_DEBUG(&self->log, "joined room %lu", foundRoom->id);
     clvSerializeServerOutRoomJoin(outStream, foundRoom->id, createdConnection->id);
 
     return 0;

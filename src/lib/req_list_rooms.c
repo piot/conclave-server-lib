@@ -20,7 +20,7 @@ int clvReqListRooms(ClvServer* self, const ClvUserSession* foundUserSession, Fld
 
     clvSerializeServerInListRooms(inStream, &listRoomsOptions);
 
-    CLOG_DEBUG("query list of rooms, max:%d", listRoomsOptions.maximumCount);
+    CLOG_C_DEBUG(&self->log, "query list of rooms, max:%d", listRoomsOptions.maximumCount);
 
     ClvSerializeListRoomsResponseOptions response;
     size_t availableRoomCount = self->rooms.count;
@@ -45,7 +45,7 @@ int clvReqListRooms(ClvServer* self, const ClvUserSession* foundUserSession, Fld
     }
     response.roomInfoCount = roomCountFilledIn;
 
-    CLOG_DEBUG("send list of rooms, found:%zu", response.roomInfoCount);
+    CLOG_C_DEBUG(&self->log, "send list of rooms, found:%zu", response.roomInfoCount);
 
     clvSerializeServerOutListRooms(outStream, &response);
 

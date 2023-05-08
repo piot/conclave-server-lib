@@ -22,7 +22,7 @@
 
 int clvServerFeed(ClvServer* self, const ClvAddress* address, const uint8_t* data, size_t len, ClvResponse* response)
 {
-    // CLOG_VERBOSE("clvServerFeed: feed: %s octetCount: %zu", clvSerializeCmdToString(data[0]), len)
+    // CLOG_C_VERBOSE("clvServerFeed: feed: %s octetCount: %zu", clvSerializeCmdToString(data[0]), len)
 #define UDP_MAX_SIZE (1200)
     static uint8_t buf[UDP_MAX_SIZE];
     FldOutStream outStream;
@@ -56,7 +56,7 @@ int clvServerFeed(ClvServer* self, const ClvAddress* address, const uint8_t* dat
                 case clvSerializeCmdPacket:
                     return clvReqPacket(self, foundUserSession, &inStream, response);
                 default:
-                    CLOG_SOFT_ERROR("clvServerFeed: unknown command %02X", data[0]);
+                    CLOG_C_SOFT_ERROR(&self->log, "clvServerFeed: unknown command %02X", data[0]);
                     return 0;
             }
             break;
@@ -70,11 +70,24 @@ int clvServerFeed(ClvServer* self, const ClvAddress* address, const uint8_t* dat
     return response->sendDatagram.send(response->sendDatagram.self, address, buf, outStream.pos);
 }
 
-int clvServerInit(ClvServer* self, struct ImprintAllocator* memory)
+int clvServerInit(ClvServer* self, struct ImprintAllocator* memory, Clog log)
 {
-    clvRoomsInit(&self->rooms, memory);
-    clvUserSessionsInit(&self->userSessions);
-    clvUsersInit(&self->users);
+    self->log = log;
+
+    Clog subLog;
+    subLog.config = log.config;
+
+    tc_snprintf(self->rooms.prefix, 32, "%s/room", log.constantPrefix);
+    subLog.constantPrefix = self->rooms.prefix;
+    clvRoomsInit(&self->rooms, memory, subLog);
+
+    tc_snprintf(self->userSessions.prefix, 32, "%s/usersession", log.constantPrefix);
+    subLog.constantPrefix = self->userSessions.prefix;
+    clvUserSessionsInit(&self->userSessions, subLog);
+
+    tc_snprintf(self->users.prefix, 32, "%s/user", log.constantPrefix);
+    subLog.constantPrefix = self->users.prefix;
+    clvUsersInit(&self->users, subLog);
 
     return 0;
 }

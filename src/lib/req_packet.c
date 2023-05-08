@@ -30,7 +30,7 @@ int clvReqPacket(ClvServer* self, const ClvUserSession* userSession, FldInStream
     }
 
     if (foundRoomConnection->id == destinationConnectionIndex) {
-        CLOG_SOFT_ERROR("can not send to self")
+        CLOG_C_SOFT_ERROR(&self->log, "can not send to self")
         return -4;
     }
 
@@ -41,7 +41,7 @@ int clvReqPacket(ClvServer* self, const ClvUserSession* userSession, FldInStream
                                                                           destinationConnectionIndex);
 
     if (foundDestinationConnection == 0) {
-        CLOG_SOFT_ERROR("could not find the destination index")
+        CLOG_C_SOFT_ERROR(&self->log, "could not find the destination index")
     }
 
     uint8_t buf[1200];

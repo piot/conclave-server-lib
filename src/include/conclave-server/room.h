@@ -5,6 +5,7 @@
 #ifndef CONCLAVE_SERVER_ROOM_H
 #define CONCLAVE_SERVER_ROOM_H
 
+#include <clog/clog.h>
 #include <conclave-server/room_connections.h>
 
 struct ClvUser;
@@ -18,11 +19,14 @@ typedef struct ClvRoom {
     uint64_t id;
     const char* name;
     const char* passcode;
-    struct ClvUser* ownedByUser;
+    const struct ClvUser* ownedByUser;
     ClvRoomConnections roomConnections;
-    struct ImprintAllocator* allocator;
+    Clog log;
+    char prefix[16];
 } ClvRoom;
 
+void clvRoomInit(ClvRoom* self, size_t roomId, const char* roomName, const struct ClvUser* ownedByUser,
+                 size_t maxMemberCount, Clog log);
 int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foundUserSession,
                                 struct ClvRoomConnection** outConnection);
 struct ClvRoomConnection* clvRoomFindConnection(ClvRoom* self, uint8_t connectionIndex);

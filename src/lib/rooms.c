@@ -11,8 +11,9 @@
 #include <flood/in_stream.h>
 #include <imprint/allocator.h>
 
-void clvRoomsInit(ClvRooms* self, struct ImprintAllocator* allocator)
+void clvRoomsInit(ClvRooms* self, struct ImprintAllocator* allocator, Clog log)
 {
+    self->log = log;
     self->capacity = 1024;
     self->rooms = IMPRINT_ALLOC_TYPE_COUNT(allocator, ClvRoom, self->capacity);
     tc_mem_clear_type_n(self->rooms, self->capacity);
@@ -31,7 +32,6 @@ void clvRoomsReset(ClvRooms* self)
             tc_free((void*) room->name);
             room->name = 0;
         }
-        /// clvRoomsDestroy(&room->members);
         clvRoomConnectionsDestroy(&room->roomConnections);
     }
     self->count = 0;
@@ -45,18 +45,18 @@ void clvRoomsDestroy(ClvRooms* self)
     }
 }
 
-int clvRoomsCreate(ClvRooms* self, const char* name, struct ClvUser* user, size_t maxRoomCount, ClvRoom** outSession)
+int clvRoomsCreate(ClvRooms* self, const char* name, struct ClvUser* user, size_t maxNumberOfMembers,
+                   ClvRoom** outSession)
 {
     for (size_t i = 1; i < self->capacity; ++i) {
         ClvRoom* room = &self->rooms[i];
         if (room->name == 0) {
-            room->name = tc_str_dup(name);
-            room->id = i;
-            room->ownedByUser = user;
-            room->allocator = self->pageAllocator;
-            // TODO: clvRoomsInit(&room->members, maxRoomCount);
-            clvRoomConnectionsInit(&room->roomConnections, maxRoomCount);
-            CLOG_INFO("created room");
+            Clog roomLog;
+            roomLog.config = self->log.config;
+            tc_snprintf(room->prefix, 32, "%s/room/%d", self->log.constantPrefix, i);
+            roomLog.constantPrefix = room->prefix;
+            clvRoomInit(room, i, name, user, maxNumberOfMembers, roomLog);
+            CLOG_C_INFO(&self->log, "created room %d", i);
             clvRoomDebugOutput(room);
             self->count++;
             *outSession = room;
@@ -101,7 +101,7 @@ int clvRoomsReadAndFind(ClvRooms* self, FldInStream* stream, ClvRoom** outSessio
     clvSerializeReadRoomId(stream, &roomId);
     int errorCode = roomsFind(self, roomId, outSession);
     if (errorCode < 0) {
-        CLOG_WARN("couldn't find room %d", roomId);
+        CLOG_C_WARN(&self->log, "couldn't find room %d", roomId);
         return errorCode;
     }
 
@@ -132,13 +132,13 @@ int clvRoomsReadAndFindRoomConnection(ClvRooms* self, FldInStream* stream,
     *outRoomConnection = &connections->connections[roomConnectionIndex];
     if ((*outRoomConnection)->owner == 0) {
         *outRoomConnection = 0;
-        CLOG_SOFT_ERROR("no owner for this connection %hhu", roomConnectionIndex);
+        CLOG_C_SOFT_ERROR(&self->log, "no owner for this connection %hhu", roomConnectionIndex);
         return -98;
     }
 
     if (requiredUserSession != (*outRoomConnection)->owner) {
         *outRoomConnection = 0;
-        CLOG_SOFT_ERROR("not allowed to access this room connection ", requiredUserSession)
+        CLOG_C_SOFT_ERROR(&self->log, "not allowed to access this room connection ", requiredUserSession)
         return -97;
     }
 

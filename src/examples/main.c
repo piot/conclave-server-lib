@@ -62,10 +62,10 @@ int main(int argc, char* argv[])
     // TODO:    ConclaveSerializeVersion applicationVersion = {0x10, 0x20, 0x30};
 
     Clog serverLog;
-    serverLog.constantPrefix = "Server";
+    serverLog.constantPrefix = "ClvServer";
     serverLog.config = &g_clog;
 
-    clvServerInit(&server, &memory.tagAllocator.info);
+    clvServerInit(&server, &memory.tagAllocator.info, serverLog);
 
 #define UDP_MAX_SIZE (1200)
 
