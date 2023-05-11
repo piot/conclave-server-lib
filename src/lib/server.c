@@ -6,6 +6,7 @@
 #include <conclave-serialize/commands.h>
 #include <conclave-serialize/debug.h>
 #include <conclave-server/address.h>
+#include <conclave-server/req_challenge.h>
 #include <conclave-server/req_list_rooms.h>
 #include <conclave-server/req_packet.h>
 #include <conclave-server/req_room_create.h>
@@ -19,6 +20,7 @@
 #include <conclave-server/user_session.h>
 #include <flood/in_stream.h>
 #include <flood/out_stream.h>
+#include <secure-random/secure_random.h>
 
 int clvServerFeed(ClvServer* self, const ClvAddress* address, const uint8_t* data, size_t len, ClvResponse* response)
 {
@@ -29,6 +31,9 @@ int clvServerFeed(ClvServer* self, const ClvAddress* address, const uint8_t* dat
     fldOutStreamInit(&outStream, buf, UDP_MAX_SIZE);
     int result = -1;
     switch (data[0]) {
+        case clvSerializeCmdChallenge:
+            result = clvReqChallenge(self, address, data + 1, len - 1, &outStream);
+            break;
         case clvSerializeCmdLogin:
             result = clvReqUserLogin(self, address, data + 1, len - 1, &outStream);
             break;
@@ -73,6 +78,8 @@ int clvServerFeed(ClvServer* self, const ClvAddress* address, const uint8_t* dat
 int clvServerInit(ClvServer* self, struct ImprintAllocator* memory, Clog log)
 {
     self->log = log;
+
+    self->secretChallengeKey = secureRandomUInt64();
 
     Clog subLog;
     subLog.config = log.config;

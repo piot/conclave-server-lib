@@ -60,5 +60,7 @@ target_include_directories(conclave_server_lib
         PUBLIC ${DEPS}piot/tiny-libc/src/include)
 target_include_directories(conclave_server_lib
         PUBLIC ${DEPS}piot/imprint/src/include)
+target_include_directories(conclave_server_lib
+        PUBLIC ${DEPS}piot/secure-random-c/src/include)
 
 target_include_directories(conclave_server_lib PUBLIC ../include)

@@ -18,7 +18,8 @@ typedef struct ClvServer {
     ClvRooms rooms;
     ClvUsers users;
     ClvUserSessions userSessions;
-    Clog log
+    Clog log;
+    ClvSerializeServerChallenge secretChallengeKey;
 } ClvServer;
 
 typedef struct ClvResponse {

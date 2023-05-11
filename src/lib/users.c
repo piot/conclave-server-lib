@@ -64,14 +64,8 @@ static int usersFind(const Users* self, uint32_t id, const ClvAddress* addr, Use
 
 */
 
-int clvUsersReadLogin(const ClvUsers* self, const ClvAddress* address, FldInStream* stream, ClvUser** outUser)
+int clvUsersReadLogin(const ClvUsers* self, const char* nameBuf, ClvUser** outUser)
 {
-    char nameBuf[33];
-    int errorCode = clvSerializeReadString(stream, nameBuf, 33);
-    if (errorCode < 0) {
-        return errorCode;
-    }
-
     for (size_t i = 0; i < self->capacity; ++i) {
         ClvUser* user = &self->users[i];
         if (user->name == 0) {

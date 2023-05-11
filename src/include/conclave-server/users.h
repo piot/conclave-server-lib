@@ -26,7 +26,6 @@ void clvUsersDestroy(ClvUsers* self);
 int clvUsersCreate(ClvUsers* sessions, struct ClvUser* user, const ClvAddress* address, struct ClvUser** outUser);
 int clvUsersReadAndFind(const ClvUsers* self, const ClvAddress* address, struct FldInStream* stream,
                         struct ClvUser** outUser);
-int clvUsersReadLogin(const ClvUsers* self, const ClvAddress* address, struct FldInStream* stream,
-                      struct ClvUser** outUser);
+int clvUsersReadLogin(const ClvUsers* self, const char* name, struct ClvUser** outUser);
 
 #endif
