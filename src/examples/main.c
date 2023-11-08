@@ -16,17 +16,6 @@
 
 clog_config g_clog;
 
-typedef struct UdpServerSocketSendToAddress {
-    struct sockaddr_in* sockAddrIn;
-    UdpServerSocket* serverSocket;
-} UdpServerSocketSendToAddress;
-
-static int sendToAddress(void* self_, const ClvAddress* address, const uint8_t* buf, size_t count)
-{
-    UdpServerSocketSendToAddress* self = (UdpServerSocketSendToAddress*) self_;
-
-    return udpServerSend(self->serverSocket, buf, count, self->sockAddrIn);
-}
 
 int main(int argc, char* argv[])
 {

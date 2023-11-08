@@ -8,14 +8,16 @@
 #include <conclave-server/req_list_rooms.h>
 #include <conclave-server/room.h>
 #include <conclave-server/server.h>
-#include <conclave-server/user.h>
 #include <conclave-server/user_session.h>
 #include <flood/in_stream.h>
 #include <flood/out_stream.h>
+#include <guise-sessions-client/user_session.h>
 
 int clvReqListRooms(ClvServer* self, const ClvUserSession* foundUserSession, FldInStream* inStream,
                     FldOutStream* outStream)
 {
+    (void) foundUserSession;
+
     ClvSerializeListRoomsOptions listRoomsOptions;
 
     clvSerializeServerInListRooms(inStream, &listRoomsOptions);
@@ -31,12 +33,12 @@ int clvReqListRooms(ClvServer* self, const ClvUserSession* foundUserSession, Fld
     size_t roomCountFilledIn = 0;
     for (size_t i = 0; i < self->rooms.capacity; ++i) {
         const ClvRoom* room = &self->rooms.rooms[i];
-        if (room->ownedByUser == 0) {
+        if (room->ownedByConclaveSession == 0) {
             continue;
         }
-        response.roomInfos[roomCountFilledIn].roomId = room->id;
+        response.roomInfos[roomCountFilledIn].roomId = (ClvSerializeRoomId) room->id;
         response.roomInfos[roomCountFilledIn].applicationId = 0;
-        response.roomInfos[roomCountFilledIn].hostUserName = room->ownedByUser->name;
+        response.roomInfos[roomCountFilledIn].ownerUserId = room->ownedByConclaveSession->guiseUserSession->userId;
         response.roomInfos[roomCountFilledIn].roomName = room->name;
         roomCountFilledIn++;
         if (roomCountFilledIn >= roomCountToSend) {

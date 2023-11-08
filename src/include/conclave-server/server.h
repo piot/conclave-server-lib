@@ -5,30 +5,31 @@
 #ifndef CONCLAVE_SERVER_SERVER_H
 #define CONCLAVE_SERVER_SERVER_H
 
-#include <conclave-server/address.h>
+#include <clog/clog.h>
 #include <conclave-server/room_connection.h>
 #include <conclave-server/rooms.h>
-#include <conclave-server/transport.h>
 #include <conclave-server/user_sessions.h>
-#include <conclave-server/users.h>
+#include <guise-sessions-client/client.h>
+#include <guise-sessions-client/address.h>
 #include <stdarg.h>
-#include <clog/clog.h>
 
 typedef struct ClvServer {
     ClvRooms rooms;
-    ClvUsers users;
     ClvUserSessions userSessions;
     Clog log;
-    ClvSerializeServerChallenge secretChallengeKey;
+    GuiseSclClient guiseSclClient;
 } ClvServer;
 
 typedef struct ClvResponse {
-    ClvServerSendDatagram sendDatagram;
+    struct DatagramTransportOut* transportOut;
 } ClvResponse;
 
-int clvServerInit(ClvServer* self, struct ImprintAllocator* memory, Clog log);
+int clvServerInit(ClvServer* self, DatagramTransport transportToGuiseServer,
+                  GuiseSerializeUserSessionId assignedSessionIdForThisRelayServer, struct ImprintAllocator* memory,
+                  Clog log);
 void clvServerDestroy(ClvServer* self);
 void clvServerReset(ClvServer* self);
-int clvServerFeed(ClvServer* self, const ClvAddress* address, const uint8_t* data, size_t len, ClvResponse* response);
+int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t* data,
+                  size_t len, ClvResponse* response);
 
 #endif

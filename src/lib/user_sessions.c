@@ -3,12 +3,11 @@
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 #include <clog/clog.h>
-#include <conclave-server/address.h>
+#include <conclave-serialize/serialize.h>
 #include <conclave-server/unique_id.h>
 #include <conclave-server/user_session.h>
 #include <conclave-server/user_sessions.h>
 #include <flood/in_stream.h>
-#include <conclave-serialize/serialize.h>
 
 void clvUserSessionsInit(ClvUserSessions* self, Clog log)
 {
@@ -22,7 +21,7 @@ void clvUserSessionsReset(ClvUserSessions* self)
 {
     for (size_t i = 0; i < self->userSessionCapacity; ++i) {
         ClvUserSession* session = &self->userSessions[i];
-        session->user = 0;
+        session->guiseUserSession = 0;
     }
 }
 
@@ -32,18 +31,18 @@ void clvUserSessionsDestroy(ClvUserSessions* self)
     tc_free(self->userSessions);
 }
 
-int clvUserSessionsCreate(ClvUserSessions* sessions, struct ClvUser* user, const ClvAddress* address,
+int clvUserSessionsCreate(ClvUserSessions* sessions, const struct GuiseSclUserSession* guiseUserSession,
                           ClvUserSession** outSession)
 {
     for (size_t i = 0; i < sessions->userSessionCapacity; ++i) {
         ClvUserSession* session = &sessions->userSessions[i];
-        if (session->user == 0) {
+        if (session->guiseUserSession == 0) {
             Clog userSessionLog;
             userSessionLog.config = sessions->log.config;
             tc_snprintf(session->prefix, 32, "%s/%zu", sessions->log.constantPrefix, i);
             userSessionLog.constantPrefix = session->prefix;
             ClvSerializeUserSessionId uniqueSessionId = clvGenerateUniqueIdFromIndex(i);
-            clvUserSessionInit(session, uniqueSessionId, address, user, userSessionLog);
+            clvUserSessionInit(session, uniqueSessionId, guiseUserSession, userSessionLog);
             *outSession = session;
             return 0;
         }
@@ -52,8 +51,8 @@ int clvUserSessionsCreate(ClvUserSessions* sessions, struct ClvUser* user, const
     return -1;
 }
 
-static int userSessionsFind(const ClvUserSessions* self, ClvSerializeUserSessionId uniqueId, const ClvAddress* addr,
-                            const ClvUserSession** outSession)
+static int userSessionsFind(const ClvUserSessions* self, ClvSerializeUserSessionId uniqueId,
+                            const GuiseSclAddress* address, const ClvUserSession** outSession)
 {
     size_t index = clvUniqueIdGetIndex(uniqueId);
     if (index >= self->userSessionCapacity) {
@@ -62,8 +61,11 @@ static int userSessionsFind(const ClvUserSessions* self, ClvSerializeUserSession
 
     ClvUserSession* foundSession = &self->userSessions[index];
     if (foundSession->userSessionId != uniqueId) {
-        CLOG_C_SOFT_ERROR(&self->log, "wrong user session id, got %016X but wanted %016X", uniqueId, foundSession->userSessionId);
+        CLOG_C_SOFT_ERROR(&self->log, "wrong user session id, got %016X but wanted %016X", uniqueId,
+                          foundSession->userSessionId);
     }
+    (void) address;
+    /*
     if (!clvAddressEqual(addr, &foundSession->address)) {
         char addrTemp[64];
         CLOG_C_SOFT_ERROR(&self->log, "wrong address %s vs %s", clvAddressToString(addr, addrTemp, 64),
@@ -71,13 +73,13 @@ static int userSessionsFind(const ClvUserSessions* self, ClvSerializeUserSession
         *outSession = 0;
         return -3;
     }
-
+*/
     *outSession = foundSession;
 
     return 0;
 }
 
-int clvUserSessionsReadAndFind(const ClvUserSessions* self, const ClvAddress* address, FldInStream* stream,
+int clvUserSessionsReadAndFind(const ClvUserSessions* self, const GuiseSclAddress* address, FldInStream* stream,
                                const ClvUserSession** outSession)
 {
 

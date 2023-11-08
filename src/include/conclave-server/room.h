@@ -8,26 +8,26 @@
 #include <clog/clog.h>
 #include <conclave-server/room_connections.h>
 
-struct ClvUser;
 struct ClvUserSession;
 struct ClvRoomConnection;
 struct ImprintAllocator;
+struct GuiseSclUserSession;
 
 #include <conclave-serialize/types.h>
 #include <stdlib.h>
 
 typedef struct ClvRoom {
-    ClvSerializeRoomId id;
-    const char* name;
+    size_t id;
+    char* name;
     const char* passcode;
-    const struct ClvUser* ownedByUser;
+    const struct ClvUserSession* ownedByConclaveSession;
     ClvRoomConnections roomConnections;
     Clog log;
     char prefix[16];
 } ClvRoom;
 
-void clvRoomInit(ClvRoom* self, size_t roomId, const char* roomName, const struct ClvUser* ownedByUser,
-                 size_t maxMemberCount, Clog log);
+void clvRoomInit(ClvRoom* self, size_t indexInRooms, const char* roomName,
+                 const struct ClvUserSession* requiredUserSession, size_t maxMemberCount, Clog log);
 int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foundUserSession,
                                 struct ClvRoomConnection** outConnection);
 struct ClvRoomConnection* clvRoomFindConnection(ClvRoom* self, uint8_t connectionIndex);

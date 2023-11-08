@@ -5,10 +5,7 @@
 #include <clog/clog.h>
 #include <conclave-serialize/commands.h>
 #include <conclave-serialize/debug.h>
-#include <conclave-server/address.h>
-#include <conclave-server/req_challenge.h>
 #include <conclave-server/req_list_rooms.h>
-#include <conclave-server/req_packet.h>
 #include <conclave-server/req_room_create.h>
 #include <conclave-server/req_room_join.h>
 #include <conclave-server/req_room_rejoin.h>
@@ -16,13 +13,35 @@
 #include <conclave-server/room.h>
 #include <conclave-server/rooms.h>
 #include <conclave-server/server.h>
-#include <conclave-server/user.h>
 #include <conclave-server/user_session.h>
 #include <flood/in_stream.h>
 #include <flood/out_stream.h>
+#include <guise-serialize/serialize.h>
+#include <guise-sessions-client/user_session.h>
+
 #include <secure-random/secure_random.h>
 
-int clvServerFeed(ClvServer* self, const ClvAddress* address, const uint8_t* data, size_t len, ClvResponse* response)
+static int readAndLookupUserSession(GuiseSclClient* client, const GuiseSclAddress* address, FldInStream* inStream,
+                                    const GuiseSclUserSession** out)
+{
+    GuiseSerializeUserSessionId userSessionId;
+    int err = guiseSerializeReadUserSessionId(inStream, &userSessionId);
+    if (err < 0) {
+        *out = 0;
+        return err;
+    }
+
+    err = guiseSclClientLookup(client, address, userSessionId, out);
+    if (err < 0) {
+        *out = 0;
+        return err;
+    }
+
+    return 0;
+}
+
+int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t* data,
+                  size_t len, ClvResponse* response)
 {
     // CLOG_C_VERBOSE("clvServerFeed: feed: %s octetCount: %zu", clvSerializeCmdToString(data[0]), len)
 #define UDP_MAX_SIZE (1200)
@@ -30,16 +49,23 @@ int clvServerFeed(ClvServer* self, const ClvAddress* address, const uint8_t* dat
     FldOutStream outStream;
     fldOutStreamInit(&outStream, buf, UDP_MAX_SIZE);
     int result = -1;
+
+    FldInStream inStream;
+    fldInStreamInit(&inStream, data + 1, len - 1);
+
     switch (data[0]) {
-        case clvSerializeCmdChallenge:
-            result = clvReqChallenge(self, address, data + 1, len - 1, &outStream);
-            break;
-        case clvSerializeCmdLogin:
-            result = clvReqUserLogin(self, address, data + 1, len - 1, &outStream);
-            break;
+        case clvSerializeCmdLogin: {
+            const GuiseSclUserSession* foundUserSession;
+            int err = readAndLookupUserSession(&self->guiseSclClient, address, &inStream, &foundUserSession);
+            if (err < 0) {
+                if (err == -1) {
+                    return 0;
+                }
+                return err;
+            }
+            result = clvReqUserLogin(self, foundUserSession, &inStream, &outStream);
+        } break;
         default: {
-            FldInStream inStream;
-            fldInStreamInit(&inStream, data + 1, len - 1);
             const ClvUserSession* foundUserSession;
             int err = clvUserSessionsReadAndFind(&self->userSessions, address, &inStream, &foundUserSession);
             if (err < 0) {
@@ -58,8 +84,6 @@ int clvServerFeed(ClvServer* self, const ClvAddress* address, const uint8_t* dat
                 case clvSerializeCmdListRooms:
                     result = clvReqListRooms(self, foundUserSession, &inStream, &outStream);
                     break;
-                case clvSerializeCmdPacket:
-                    return clvReqPacket(self, foundUserSession, &inStream, response);
                 default:
                     CLOG_C_SOFT_ERROR(&self->log, "clvServerFeed: unknown command %02X", data[0]);
                     return 0;
@@ -72,17 +96,19 @@ int clvServerFeed(ClvServer* self, const ClvAddress* address, const uint8_t* dat
         return result;
     }
 
-    return response->sendDatagram.send(response->sendDatagram.self, address, buf, outStream.pos);
+    return response->transportOut->send(response->transportOut->self, buf, outStream.pos);
 }
 
-int clvServerInit(ClvServer* self, struct ImprintAllocator* memory, Clog log)
+int clvServerInit(ClvServer* self, DatagramTransport transportToGuiseServer,
+                  GuiseSerializeUserSessionId assignedSessionIdForThisRelayServer, struct ImprintAllocator* memory,
+                  Clog log)
 {
     self->log = log;
 
-    self->secretChallengeKey = secureRandomUInt64();
-
     Clog subLog;
     subLog.config = log.config;
+    guiseSclClientInit(&self->guiseSclClient, transportToGuiseServer, assignedSessionIdForThisRelayServer, subLog);
+
 
     tc_snprintf(self->rooms.prefix, 32, "%s/rooms", log.constantPrefix);
     subLog.constantPrefix = self->rooms.prefix;
@@ -92,10 +118,6 @@ int clvServerInit(ClvServer* self, struct ImprintAllocator* memory, Clog log)
     subLog.constantPrefix = self->userSessions.prefix;
     clvUserSessionsInit(&self->userSessions, subLog);
 
-    tc_snprintf(self->users.prefix, 32, "%s/users", log.constantPrefix);
-    subLog.constantPrefix = self->users.prefix;
-    clvUsersInit(&self->users, subLog);
-
     return 0;
 }
 
@@ -103,12 +125,10 @@ void clvServerReset(ClvServer* self)
 {
     clvRoomsReset(&self->rooms);
     clvUserSessionsReset(&self->userSessions);
-    clvUsersReset(&self->users);
 }
 
 void clvServerDestroy(ClvServer* self)
 {
     clvRoomsDestroy(&self->rooms);
     clvUserSessionsDestroy(&self->userSessions);
-    clvUsersDestroy(&self->users);
 }

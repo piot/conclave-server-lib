@@ -4,10 +4,10 @@
  *--------------------------------------------------------------------------------------------*/
 #include <conclave-server/user_session.h>
 
-void clvUserSessionInit(ClvUserSession* self, ClvSerializeUserSessionId id, const ClvAddress* address, const struct ClvUser* owner, Clog log)
+void clvUserSessionInit(ClvUserSession* self, ClvSerializeUserSessionId id, const struct GuiseSclUserSession* guiseUserSession,
+                        Clog log)
 {
     self->log = log;
     self->userSessionId = id;
-    self->address = *address;
-    self->user = owner;
+    self->guiseUserSession = guiseUserSession;
 }

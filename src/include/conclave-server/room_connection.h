@@ -13,9 +13,8 @@ struct ClvUserSession;
 struct ImprintAllocator;
 struct ClvRoom;
 
-/** Represents a unreliable datagram transport "connection" from a client */
 typedef struct ClvRoomConnection {
-    ClvSerializeRoomId id;
+    ClvSerializeRoomConnectionIndex id;
     const struct ClvUserSession* owner;
     struct ClvRoom* ownedByRoom;
 } ClvRoomConnection;

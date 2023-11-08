@@ -29,7 +29,7 @@ int clvReqRoomJoin(ClvServer* self, const ClvUserSession* foundUserSession, FldI
     }
 
     CLOG_C_DEBUG(&self->log, "joined room %lu", foundRoom->id);
-    clvSerializeServerOutRoomJoin(outStream, foundRoom->id, createdConnection->id);
+    clvSerializeServerOutRoomJoin(outStream, (ClvSerializeRoomId) foundRoom->id, createdConnection->id);
 
     return 0;
 }

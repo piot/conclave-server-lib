@@ -5,12 +5,12 @@
 #ifndef CONCLAVE_SERVER_REQ_USER_LOGIN_H
 #define CONCLAVE_SERVER_REQ_USER_LOGIN_H
 
-#include <conclave-server/address.h>
-
 struct ClvServer;
 struct FldOutStream;
+struct FldInStream;
+struct GuiseSclUserSession;
 
-int clvReqUserLogin(struct ClvServer* self, const ClvAddress* address, const uint8_t* data, size_t len,
-                    struct FldOutStream* response);
+int clvReqUserLogin(struct ClvServer* self, const struct GuiseSclUserSession* userSession, struct FldInStream* inStream,
+                    struct FldOutStream* outStream);
 
 #endif

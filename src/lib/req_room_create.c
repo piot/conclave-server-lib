@@ -23,9 +23,9 @@ int clvReqRoomCreate(ClvRooms* self, const ClvUserSession* foundUserSession, Fld
     fldInStreamReadUInt8(inStream, &flags);
 
     ClvRoom* createdRoom;
-    int roomId = clvRoomsCreate(self, name, foundUserSession->user, numberOfPlayers, &createdRoom);
-    if (roomId < 0) {
-        return roomId;
+    int worked = clvRoomsCreate(self, name, foundUserSession, numberOfPlayers, &createdRoom);
+    if (worked < 0) {
+        return worked;
     }
 
     CLOG_C_INFO(&self->log, "room create handle %d '%s' %d", roomId, name, numberOfPlayers)
@@ -37,5 +37,5 @@ int clvReqRoomCreate(ClvRooms* self, const ClvUserSession* foundUserSession, Fld
         return errorCode;
     }
 
-    return clvSerializeServerOutRoomCreate(outStream, roomId, createdConnection->id);
+    return clvSerializeServerOutRoomCreate(outStream, (ClvSerializeRoomId) createdRoom->id, createdConnection->id);
 }

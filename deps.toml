@@ -8,6 +8,10 @@ name = 'piot/conclave-serialize-c'
 version = "*"
 
 [[dependencies]]
+name = 'piot/guise-session-client-c'
+version = "*"
+
+[[dependencies]]
 name = 'piot/flood-c'
 version = "*"
 

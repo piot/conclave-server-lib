@@ -5,8 +5,6 @@
 #ifndef CONCLAVE_SERVER_REQ_ROOM_REJOIN_H
 #define CONCLAVE_SERVER_REQ_ROOM_REJOIN_H
 
-#include <conclave-server/address.h>
-
 #include <stdint.h>
 
 struct ClvServer;

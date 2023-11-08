@@ -5,8 +5,6 @@
 #ifndef CONCLAVE_SERVER_REQ_ROOM_CREATE_H
 #define CONCLAVE_SERVER_REQ_ROOM_CREATE_H
 
-#include <conclave-server/address.h>
-
 struct ClvRooms;
 struct ClvUserSession;
 struct FldOutStream;

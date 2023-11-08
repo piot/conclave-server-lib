@@ -18,7 +18,7 @@ void clvRoomsInit(ClvRooms* self, struct ImprintAllocator* allocator, Clog log)
     self->rooms = IMPRINT_ALLOC_TYPE_COUNT(allocator, ClvRoom, self->capacity);
     tc_mem_clear_type_n(self->rooms, self->capacity);
     for (size_t i = 0; i < self->capacity; ++i) {
-        self->rooms[i].id = i;
+        self->rooms[i].id = (ClvSerializeRoomId) i;
     }
     self->pageAllocator = allocator;
     self->count = 0;
@@ -45,7 +45,7 @@ void clvRoomsDestroy(ClvRooms* self)
     }
 }
 
-int clvRoomsCreate(ClvRooms* self, const char* name, const struct ClvUser* user, size_t maxNumberOfMembers,
+int clvRoomsCreate(ClvRooms* self, const char* name, const struct ClvUserSession* requiredUserSession, size_t maxNumberOfMembers,
                    ClvRoom** outSession)
 {
     for (size_t i = 1; i < self->capacity; ++i) {
@@ -53,14 +53,14 @@ int clvRoomsCreate(ClvRooms* self, const char* name, const struct ClvUser* user,
         if (room->name == 0) {
             Clog roomLog;
             roomLog.config = self->log.config;
-            tc_snprintf(room->prefix, 32, "%s/%d", self->log.constantPrefix, i);
+            tc_snprintf(room->prefix, 32, "%s/%zu", self->log.constantPrefix, i);
             roomLog.constantPrefix = room->prefix;
-            clvRoomInit(room, i, name, user, maxNumberOfMembers, roomLog);
+            clvRoomInit(room, i, name, requiredUserSession, maxNumberOfMembers, roomLog);
             CLOG_C_INFO(&self->log, "created room %d", i);
             clvRoomDebugOutput(room);
             self->count++;
             *outSession = room;
-            return i;
+            return (int)i;
         }
     }
     *outSession = 0;

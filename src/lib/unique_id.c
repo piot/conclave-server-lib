@@ -7,7 +7,7 @@
 
 ClvUniqueId clvGenerateUniqueIdFromIndex(size_t index)
 {
-    uint32_t upperPart = rand() % 0xffffffff;
+    uint32_t upperPart = (((uint32_t)rand()) % 0xffffffff);
 
     ClvUniqueId uniqueIndex = ((uint64_t)upperPart << 32) | index;
 
