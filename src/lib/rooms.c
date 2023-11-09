@@ -89,7 +89,7 @@ int clvRoomsReadAndFind(ClvRooms* self, FldInStream* stream, ClvRoom** outSessio
     clvSerializeReadRoomId(stream, &roomId);
     int errorCode = roomsFind(self, roomId, outSession);
     if (errorCode < 0) {
-        CLOG_C_WARN(&self->log, "couldn't find room %d", roomId);
+        CLOG_C_WARN(&self->log, "couldn't find room %d", roomId)
         return errorCode;
     }
 
