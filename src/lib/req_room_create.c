@@ -28,7 +28,7 @@ int clvReqRoomCreate(ClvRooms* self, const ClvUserSession* foundUserSession, Fld
         return worked;
     }
 
-    CLOG_C_INFO(&self->log, "room create handle %d '%s' %d", roomId, name, numberOfPlayers)
+    CLOG_C_INFO(&self->log, "room create handle %zu '%s' %d", createdRoom->id, name, numberOfPlayers)
     ClvRoomConnection* createdConnection;
 
     int errorCode = clvRoomCreateRoomConnection(createdRoom, foundUserSession, &createdConnection);

@@ -27,6 +27,3 @@ version = "*"
 name = 'piot/secure-random-c'
 version = "*"
 
-[[development]]
-name = 'piot/udp-server-c'
-version = "*"

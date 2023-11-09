@@ -15,6 +15,3 @@ add_subdirectory(deps/piot/tiny-libc/src/lib)
 
 add_subdirectory(lib)
 # add_subdirectory(examples)
-
-
-add_subdirectory(deps/piot/udp-server-c/src/lib)

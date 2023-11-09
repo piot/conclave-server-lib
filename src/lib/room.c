@@ -6,7 +6,6 @@
 #include <conclave-server/room.h>
 #include <conclave-server/room_connection.h>
 
-
 static int roomCreateConnection(ClvRoom* self, const struct ClvUserSession* ownerOfConnection,
                                 ClvRoomConnection** outConnection)
 {
@@ -47,8 +46,8 @@ ClvRoomConnection* clvRoomFindConnection(ClvRoom* self, uint8_t connectionIndex)
     return &self->roomConnections.connections[connectionIndex];
 }
 
-void clvRoomInit(ClvRoom* self, size_t indexInRooms, const char* roomName, const struct ClvUserSession* requiredUserSession, size_t maxMemberCount,
-                 Clog log)
+void clvRoomInit(ClvRoom* self, size_t indexInRooms, const char* roomName,
+                 const struct ClvUserSession* requiredUserSession, size_t maxMemberCount, Clog log)
 {
     self->log = log;
     self->name = tc_str_dup(roomName);
@@ -86,8 +85,7 @@ int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foun
 #if defined CLOG_LOG_ENABLED
 void clvRoomDebugOutput(const ClvRoom* self)
 {
-    CLOG_C_INFO(&self->log, "'%s' (members %zu, connections %zu)", self->name, 0,
-                self->roomConnections.connectionCount);
+    CLOG_C_INFO(&self->log, "'%s' (members %u, connections %zu)", self->name, 0u, self->roomConnections.connectionCount)
 }
 
 #endif

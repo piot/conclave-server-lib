@@ -10,6 +10,7 @@
 #include <conclave-server/user_session.h>
 #include <flood/in_stream.h>
 #include <imprint/allocator.h>
+#include <inttypes.h>
 
 void clvRoomsInit(ClvRooms* self, struct ImprintAllocator* allocator, Clog log)
 {
@@ -45,8 +46,8 @@ void clvRoomsDestroy(ClvRooms* self)
     }
 }
 
-int clvRoomsCreate(ClvRooms* self, const char* name, const struct ClvUserSession* requiredUserSession, size_t maxNumberOfMembers,
-                   ClvRoom** outSession)
+int clvRoomsCreate(ClvRooms* self, const char* name, const struct ClvUserSession* requiredUserSession,
+                   size_t maxNumberOfMembers, ClvRoom** outSession)
 {
     for (size_t i = 1; i < self->capacity; ++i) {
         ClvRoom* room = &self->rooms[i];
@@ -56,11 +57,13 @@ int clvRoomsCreate(ClvRooms* self, const char* name, const struct ClvUserSession
             tc_snprintf(room->prefix, 32, "%s/%zu", self->log.constantPrefix, i);
             roomLog.constantPrefix = room->prefix;
             clvRoomInit(room, i, name, requiredUserSession, maxNumberOfMembers, roomLog);
-            CLOG_C_INFO(&self->log, "created room %d", i);
+            CLOG_C_INFO(&self->log, "created room %zu", i)
+#if defined CLOG_LOG_ENABLED
             clvRoomDebugOutput(room);
+#endif
             self->count++;
             *outSession = room;
-            return (int)i;
+            return (int) i;
         }
     }
     *outSession = 0;
@@ -78,7 +81,6 @@ static inline int roomsFind(ClvRooms* self, ClvSerializeRoomId index, ClvRoom** 
 
     return 0;
 }
-
 
 int clvRoomsReadAndFind(ClvRooms* self, FldInStream* stream, ClvRoom** outSession)
 {
@@ -118,13 +120,14 @@ int clvRoomsReadAndFindRoomConnection(ClvRooms* self, FldInStream* stream,
     *outRoomConnection = &connections->connections[roomConnectionIndex];
     if ((*outRoomConnection)->owner == 0) {
         *outRoomConnection = 0;
-        CLOG_C_SOFT_ERROR(&self->log, "no owner for this connection %hhu", roomConnectionIndex);
+        CLOG_C_SOFT_ERROR(&self->log, "no owner for this connection %hhu", roomConnectionIndex)
         return -98;
     }
 
     if (requiredUserSession != (*outRoomConnection)->owner) {
         *outRoomConnection = 0;
-        CLOG_C_SOFT_ERROR(&self->log, "not allowed to access this room connection ", requiredUserSession)
+        CLOG_C_SOFT_ERROR(&self->log, "not allowed to access this room connection %" PRIX64,
+                          requiredUserSession->userSessionId)
         return -97;
     }
 

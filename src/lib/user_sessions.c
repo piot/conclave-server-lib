@@ -8,6 +8,7 @@
 #include <conclave-server/user_session.h>
 #include <conclave-server/user_sessions.h>
 #include <flood/in_stream.h>
+#include <inttypes.h>
 
 void clvUserSessionsInit(ClvUserSessions* self, Clog log)
 {
@@ -61,8 +62,8 @@ static int userSessionsFind(const ClvUserSessions* self, ClvSerializeUserSession
 
     ClvUserSession* foundSession = &self->userSessions[index];
     if (foundSession->userSessionId != uniqueId) {
-        CLOG_C_SOFT_ERROR(&self->log, "wrong user session id, got %016X but wanted %016X", uniqueId,
-                          foundSession->userSessionId);
+        CLOG_C_SOFT_ERROR(&self->log, "wrong user session id, got %" PRIX64 " but wanted %" PRIX64, uniqueId,
+                          foundSession->userSessionId)
     }
     (void) address;
     /*
@@ -88,7 +89,7 @@ int clvUserSessionsReadAndFind(const ClvUserSessions* self, const GuiseSclAddres
 
     int errorCode = userSessionsFind(self, userSessionId, address, outSession);
     if (errorCode < 0) {
-        CLOG_C_WARN(&self->log, "couldn't find user session %d", userSessionId);
+        CLOG_C_WARN(&self->log, "couldn't find user session %" PRIX64, userSessionId)
         return errorCode;
     }
 
