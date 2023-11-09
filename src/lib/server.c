@@ -85,7 +85,7 @@ int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t
                     result = clvReqListRooms(self, foundUserSession, &inStream, &outStream);
                     break;
                 default:
-                    CLOG_C_SOFT_ERROR(&self->log, "clvServerFeed: unknown command %02X", data[0]);
+                    CLOG_C_SOFT_ERROR(&self->log, "clvServerFeed: unknown command %02X", data[0])
                     return 0;
             }
             break;

@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
         size = UDP_MAX_SIZE;
         errorCode = udpServerReceive(&daemon.socket, buf, &size, &address);
         if (errorCode < 0) {
-            CLOG_WARN("problem with receive %d", errorCode);
+            CLOG_WARN("problem with receive %d", errorCode)
         } else {
             socketSendToAddress.sockAddrIn = &address;
 
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
 #endif
             errorCode = clvServerFeed(&server, &address, buf, size, &response);
             if (errorCode < 0) {
-                CLOG_WARN("clvServerFeed: error %d", errorCode);
+                CLOG_WARN("clvServerFeed: error %d", errorCode)
             }
         }
     }
