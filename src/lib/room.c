@@ -60,7 +60,7 @@ int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foun
                                 ClvRoomConnection** outConnection)
 {
     if (foundUserSession == 0) {
-        CLOG_C_ERROR(&self->log, "creator is null");
+        CLOG_C_ERROR(&self->log, "creator is null")
     }
 
     int errorCode = clvRoomConnectionsFindConnection(&self->roomConnections, foundUserSession, outConnection);
