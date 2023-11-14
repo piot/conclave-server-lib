@@ -40,10 +40,13 @@ static int readAndLookupUserSession(GuiseSclClient* client, const GuiseSclAddres
     return 0;
 }
 
-int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t* data,
-                  size_t len, ClvResponse* response)
+int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t* data, size_t len,
+                  ClvResponse* response)
 {
-    // CLOG_C_VERBOSE("clvServerFeed: feed: %s octetCount: %zu", clvSerializeCmdToString(data[0]), len)
+    CLOG_ASSERT(len != 0, "clvServerFeed: len is not allowed to be zero")
+#if defined CLOG_LOG_ENABLED
+    CLOG_C_VERBOSE(&self->log, "clvServerFeed: feed: %s octetCount: %zu", clvSerializeCmdToString(data[0]), len)
+#endif
 #define UDP_MAX_SIZE (1200)
     static uint8_t buf[UDP_MAX_SIZE];
     FldOutStream outStream;
@@ -59,8 +62,10 @@ int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t
             int err = readAndLookupUserSession(&self->guiseSclClient, address, &inStream, &foundUserSession);
             if (err < 0) {
                 if (err == -1) {
+                    CLOG_C_VERBOSE(&self->log, "did not get a response from guise daemon yet")
                     return 0;
                 }
+                CLOG_C_WARN(&self->log, "something went wrong with guise scl client lookup %d", err)
                 return err;
             }
             result = clvReqUserLogin(self, foundUserSession, &inStream, &outStream);
@@ -109,7 +114,6 @@ int clvServerInit(ClvServer* self, DatagramTransport transportToGuiseServer,
     subLog.config = log.config;
     guiseSclClientInit(&self->guiseSclClient, transportToGuiseServer, assignedSessionIdForThisRelayServer, subLog);
 
-
     tc_snprintf(self->rooms.prefix, 32, "%s/rooms", log.constantPrefix);
     subLog.constantPrefix = self->rooms.prefix;
     clvRoomsInit(&self->rooms, memory, subLog);
@@ -119,6 +123,11 @@ int clvServerInit(ClvServer* self, DatagramTransport transportToGuiseServer,
     clvUserSessionsInit(&self->userSessions, subLog);
 
     return 0;
+}
+
+int clvServerUpdate(ClvServer* self)
+{
+    return guiseSclClientUpdate(&self->guiseSclClient);
 }
 
 void clvServerReset(ClvServer* self)

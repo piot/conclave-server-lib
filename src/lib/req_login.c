@@ -28,6 +28,5 @@ int clvReqUserLogin(ClvServer* self, const struct GuiseSclUserSession* userSessi
     CLOG_C_DEBUG(&self->log, "logged in user '%s' and created user session %" PRIx64,
                  foundSession->guiseUserSession->userName.utf8, foundSession->userSessionId)
 
-    clvSerializeServerOutLogin(outStream, clientNonce, foundSession->userSessionId);
-    return 0;
+    return clvSerializeServerOutLogin(outStream, clientNonce, foundSession->userSessionId);
 }

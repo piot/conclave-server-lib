@@ -9,8 +9,8 @@
 #include <conclave-server/room_connection.h>
 #include <conclave-server/rooms.h>
 #include <conclave-server/user_sessions.h>
-#include <guise-sessions-client/client.h>
 #include <guise-sessions-client/address.h>
+#include <guise-sessions-client/client.h>
 #include <stdarg.h>
 
 typedef struct ClvServer {
@@ -29,7 +29,8 @@ int clvServerInit(ClvServer* self, DatagramTransport transportToGuiseServer,
                   Clog log);
 void clvServerDestroy(ClvServer* self);
 void clvServerReset(ClvServer* self);
-int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t* data,
-                  size_t len, ClvResponse* response);
+int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t* data, size_t len,
+                  ClvResponse* response);
+int clvServerUpdate(ClvServer* self);
 
 #endif

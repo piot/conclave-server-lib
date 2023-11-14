@@ -17,7 +17,7 @@ int clvReqRoomJoin(ClvServer* self, const ClvUserSession* foundUserSession, FldI
     ClvRoom* foundRoom;
     int errorCode = clvRoomsReadAndFind(&self->rooms, inStream, &foundRoom);
     if (errorCode < 0) {
-        CLOG_C_WARN(&self->log, "couldn't find room")
+    CLOG_C_WARN(&self->log, "couldn't find room")
         return errorCode;
     }
     ClvRoomConnection* createdConnection;
