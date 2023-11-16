@@ -9,10 +9,13 @@
 #include <conclave-serialize/types.h>
 
 struct GuiseSclUserSession;
+struct ClvRoomConnection;
 
 typedef struct ClvUserSession {
     ClvSerializeUserSessionId userSessionId;
+    GuiseSerializeUserId userId;
     const struct GuiseSclUserSession* guiseUserSession;
+    struct ClvRoomConnection* primaryRoomConnection;
     Clog log;
     char prefix[32];
 } ClvUserSession;

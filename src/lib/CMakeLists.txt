@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.16.3)
 add_library(conclave-server-lib STATIC 
   req_list_rooms.c
   req_login.c
+  req_ping.c
   req_room_create.c
   req_room_join.c
   req_room_rejoin.c

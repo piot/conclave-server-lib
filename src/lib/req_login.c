@@ -17,7 +17,7 @@ int clvReqUserLogin(ClvServer* self, const struct GuiseSclUserSession* userSessi
                     FldOutStream* outStream)
 {
     ClvSerializeClientNonce clientNonce;
-    clvSerializeReadUserSessionId(inStream, &clientNonce);
+    clvSerializeReadClientNonce(inStream, &clientNonce);
 
     ClvUserSession* foundSession;
     int err = clvUserSessionsCreate(&self->userSessions, userSession, &foundSession);

@@ -8,6 +8,7 @@
 #include <conclave-server/user_session.h>
 #include <conclave-server/user_sessions.h>
 #include <flood/in_stream.h>
+#include <guise-sessions-client/user_session.h>
 #include <inttypes.h>
 
 void clvUserSessionsInit(ClvUserSessions* self, Clog log)
@@ -32,7 +33,7 @@ void clvUserSessionsDestroy(ClvUserSessions* self)
     tc_free(self->userSessions);
 }
 
-int clvUserSessionsCreate(ClvUserSessions* sessions, const struct GuiseSclUserSession* guiseUserSession,
+int clvUserSessionsCreate(ClvUserSessions* sessions, const GuiseSclUserSession* guiseUserSession,
                           ClvUserSession** outSession)
 {
     for (size_t i = 0; i < sessions->userSessionCapacity; ++i) {
@@ -53,7 +54,7 @@ int clvUserSessionsCreate(ClvUserSessions* sessions, const struct GuiseSclUserSe
 }
 
 static int userSessionsFind(const ClvUserSessions* self, ClvSerializeUserSessionId uniqueId,
-                            const GuiseSclAddress* address, const ClvUserSession** outSession)
+                            const GuiseSclAddress* address, ClvUserSession** outSession)
 {
     size_t index = clvUniqueIdGetIndex(uniqueId);
     if (index >= self->userSessionCapacity) {
@@ -81,7 +82,7 @@ static int userSessionsFind(const ClvUserSessions* self, ClvSerializeUserSession
 }
 
 int clvUserSessionsReadAndFind(const ClvUserSessions* self, const GuiseSclAddress* address, FldInStream* stream,
-                               const ClvUserSession** outSession)
+                               ClvUserSession** outSession)
 {
 
     ClvSerializeUserSessionId userSessionId;

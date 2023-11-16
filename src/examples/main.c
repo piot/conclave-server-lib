@@ -16,7 +16,6 @@
 
 clog_config g_clog;
 
-
 int main(int argc, char* argv[])
 {
     (void) argc;
@@ -59,7 +58,6 @@ int main(int argc, char* argv[])
 #define UDP_MAX_SIZE (1200)
 
     uint8_t buf[UDP_MAX_SIZE];
-    size_t size;
     struct sockaddr_in address;
     int errorCode;
 
@@ -72,8 +70,7 @@ int main(int argc, char* argv[])
     CLOG_OUTPUT("ready for incoming packets")
 
     while (true) {
-        size = UDP_MAX_SIZE;
-        errorCode = udpServerReceive(&daemon.socket, buf, &size, &address);
+        errorCode = udpServerReceive(&daemon.socket, buf, UDP_MAX_SIZE, &address);
         if (errorCode < 0) {
             CLOG_WARN("problem with receive %d", errorCode)
         } else {
@@ -83,7 +80,7 @@ int main(int argc, char* argv[])
 #if 0
             nimbleSerializeDebugHex("received", buf, size);
 #endif
-            errorCode = clvServerFeed(&server, &address, buf, size, &response);
+            errorCode = clvServerFeed(&server, &address, buf, (size_t) errorCode, &response);
             if (errorCode < 0) {
                 CLOG_WARN("clvServerFeed: error %d", errorCode)
             }

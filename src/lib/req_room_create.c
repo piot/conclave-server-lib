@@ -12,8 +12,7 @@
 #include <flood/in_stream.h>
 #include <flood/out_stream.h>
 
-int clvReqRoomCreate(ClvRooms* self, const ClvUserSession* foundUserSession, FldInStream* inStream,
-                     FldOutStream* outStream)
+int clvReqRoomCreate(ClvRooms* self, ClvUserSession* foundUserSession, FldInStream* inStream, FldOutStream* outStream)
 {
     char name[64];
     uint8_t numberOfPlayers;
@@ -36,6 +35,8 @@ int clvReqRoomCreate(ClvRooms* self, const ClvUserSession* foundUserSession, Fld
         CLOG_C_WARN(&self->log, "couldn't creat room connection")
         return errorCode;
     }
+
+    foundUserSession->primaryRoomConnection = createdConnection;
 
     return clvSerializeServerOutRoomCreate(outStream, (ClvSerializeRoomId) createdRoom->id, createdConnection->id);
 }

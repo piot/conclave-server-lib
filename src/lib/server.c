@@ -10,6 +10,7 @@
 #include <conclave-server/req_room_join.h>
 #include <conclave-server/req_room_rejoin.h>
 #include <conclave-server/req_user_login.h>
+#include <conclave-server/req_ping.h>
 #include <conclave-server/room.h>
 #include <conclave-server/rooms.h>
 #include <conclave-server/server.h>
@@ -71,7 +72,7 @@ int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t
             result = clvReqUserLogin(self, foundUserSession, &inStream, &outStream);
         } break;
         default: {
-            const ClvUserSession* foundUserSession;
+            ClvUserSession* foundUserSession;
             int err = clvUserSessionsReadAndFind(&self->userSessions, address, &inStream, &foundUserSession);
             if (err < 0) {
                 return err;
@@ -81,13 +82,16 @@ int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t
                     result = clvReqRoomCreate(&self->rooms, foundUserSession, &inStream, &outStream);
                     break;
                 case clvSerializeCmdRoomJoin:
-                    result = clvReqRoomJoin(self, foundUserSession, &inStream, &outStream);
+                    result = clvReqRoomJoin(self, (const ClvUserSession*) foundUserSession, &inStream, &outStream);
                     break;
                 case clvSerializeCmdRoomReJoin:
-                    result = clvReqRoomReJoin(self, foundUserSession, &inStream, &outStream);
+                    result = clvReqRoomReJoin(self, (const ClvUserSession*) foundUserSession, &inStream, &outStream);
                     break;
                 case clvSerializeCmdListRooms:
-                    result = clvReqListRooms(self, foundUserSession, &inStream, &outStream);
+                    result = clvReqListRooms(self, (const ClvUserSession*) foundUserSession, &inStream, &outStream);
+                    break;
+                case clvSerializeCmdPing:
+                    result = clvReqPing(self, (const ClvUserSession*) foundUserSession, &inStream, &outStream);
                     break;
                 default:
                     CLOG_C_SOFT_ERROR(&self->log, "clvServerFeed: unknown command %02X", data[0])
