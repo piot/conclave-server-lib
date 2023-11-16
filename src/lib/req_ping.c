@@ -47,7 +47,7 @@ int clvReqPing(ClvServer* self, const struct ClvUserSession* userSession, struct
             foundOwner = true;
             indexOfOwner = i;
         }
-    };
+    }
 
     if (!foundOwner) {
         CLOG_C_ERROR(&self->log, "no owner of the room. panic")
