@@ -10,7 +10,9 @@ struct ClvUserSession;
 struct FldOutStream;
 struct FldInStream;
 
-int clvReqRoomCreate(struct ClvRooms* self, struct ClvUserSession* userSession, struct FldInStream* inStream,
-                     struct FldOutStream* outStream);
+#include <monotonic-time/monotonic_time.h>
+
+int clvReqRoomCreate(struct ClvRooms* self, struct ClvUserSession* userSession, MonotonicTimeMs now,
+                     struct FldInStream* inStream, struct FldOutStream* outStream);
 
 #endif

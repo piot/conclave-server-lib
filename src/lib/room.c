@@ -6,7 +6,7 @@
 #include <conclave-server/room.h>
 #include <conclave-server/room_connection.h>
 
-static int roomCreateConnection(ClvRoom* self, const struct ClvUserSession* ownerOfConnection,
+static int roomCreateConnection(ClvRoom* self, const struct ClvUserSession* ownerOfConnection, MonotonicTimeMs now,
                                 ClvRoomConnection** outConnection)
 {
     ClvRoomConnections* connections = &self->roomConnections;
@@ -19,7 +19,7 @@ static int roomCreateConnection(ClvRoom* self, const struct ClvUserSession* owne
                 CLOG_C_ERROR(&self->log, "could not create a connection in the room, owner is null")
             }
             roomConnection->id = (ClvSerializeRoomConnectionIndex) i;
-            clvRoomConnectionInit(roomConnection, self, ownerOfConnection);
+            clvRoomConnectionInit(roomConnection, self, ownerOfConnection, now);
             connections->connectionCount++;
 
             *outConnection = roomConnection;
@@ -46,17 +46,16 @@ ClvRoomConnection* clvRoomFindConnection(ClvRoom* self, uint8_t connectionIndex)
     return &self->roomConnections.connections[connectionIndex];
 }
 
-void clvRoomInit(ClvRoom* self, size_t indexInRooms, const char* roomName,
-                 const struct ClvUserSession* requiredUserSession, size_t maxMemberCount, Clog log)
+void clvRoomInit(ClvRoom* self, size_t indexInRooms, const char* roomName, size_t maxMemberCount, Clog log)
 {
     self->log = log;
     self->name = tc_str_dup(roomName);
     self->id = indexInRooms;
-    self->ownedByConclaveSession = requiredUserSession;
+    self->ownedByConnection = 0;
     clvRoomConnectionsInit(&self->roomConnections, maxMemberCount);
 }
 
-int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foundUserSession,
+int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foundUserSession, MonotonicTimeMs now,
                                 ClvRoomConnection** outConnection)
 {
     if (foundUserSession == 0) {
@@ -73,13 +72,34 @@ int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foun
         return 0;
     }
 
-    errorCode = roomCreateConnection(self, foundUserSession, outConnection);
+    errorCode = roomCreateConnection(self, foundUserSession, now, outConnection);
     if (errorCode < 0) {
         *outConnection = 0;
         return errorCode;
     }
 
     return 0;
+}
+
+void clvRoomCheckValidOwner(ClvRoom* self)
+{
+    if (self->ownedByConnection == 0) {
+        if (self->roomConnections.connectionCount == 0) {
+            return;
+        }
+        self->ownedByConnection = &self->roomConnections.connections[0];
+        return;
+    }
+
+    bool shouldDisconnect = clvRoomConnectionShouldDisconnect(self->ownedByConnection);
+    if (!shouldDisconnect) {
+        return;
+    }
+
+    // Disconnect owner
+    clvRoomConnectionsDestroyConnection(&self->roomConnections, self->ownedByConnection);
+    self->ownedByConnection = clvRoomConnectionsFindConnectionWithMostKnowledge(&self->roomConnections);
+
 }
 
 #if defined CLOG_LOG_ENABLED

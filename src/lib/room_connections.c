@@ -20,6 +20,13 @@ void clvRoomConnectionsDestroy(ClvRoomConnections* self)
     tc_free(self->connections);
 }
 
+void clvRoomConnectionsDestroyConnection(ClvRoomConnections* self, ClvRoomConnection* connection)
+{
+    (void) self;
+    connection->ownedByRoom = 0;
+    connection->owner = 0;
+}
+
 int clvRoomConnectionsFindConnection(ClvRoomConnections* self, const struct ClvUserSession* ownerOfConnection,
                                      ClvRoomConnection** outConnection)
 {
@@ -35,4 +42,21 @@ int clvRoomConnectionsFindConnection(ClvRoomConnections* self, const struct ClvU
     *outConnection = 0;
 
     return 0;
+}
+
+ClvRoomConnection* clvRoomConnectionsFindConnectionWithMostKnowledge(ClvRoomConnections* self)
+{
+    ClvRoomConnection* bestConnection = 0;
+
+    for (size_t i = 0; i < self->connectionCount; ++i) {
+        ClvRoomConnection* roomConnection = &self->connections[i];
+        if (roomConnection->owner == 0) {
+            continue;
+        }
+        if (bestConnection == 0 || roomConnection->knowledge > bestConnection->knowledge) {
+            bestConnection = roomConnection;
+        }
+    }
+
+    return bestConnection;
 }

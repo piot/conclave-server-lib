@@ -17,27 +17,12 @@
 
 #define nullptr ((void*) 0)
 
-int clvReqPing(ClvServer* self, const struct ClvUserSession* userSession, struct FldInStream* inStream,
-               FldOutStream* outStream)
+static void writePingResponse(ClvRoom* foundRoom, FldOutStream* outStream)
 {
-    uint64_t knowledge;
-
-    clvSerializeServerInPing(inStream, &knowledge);
-
-    ClvRoomConnection* foundRoomConnection = userSession->primaryRoomConnection;
-    if (foundRoomConnection == nullptr) {
-        CLOG_C_NOTICE(&self->log, "user has no room yet")
-        return 0;
-    }
-
-    ClvRoom* foundRoom = foundRoomConnection->ownedByRoom;
-
     ClvSerializePingResponseOptions pingResponse;
-
     pingResponse.roomInfo.memberCount = foundRoom->roomConnections.connectionCount;
 
-    GuiseSerializeUserId roomOwnedByUserId = foundRoom->ownedByConclaveSession->guiseUserSession->userId;
-
+    GuiseSerializeUserId roomOwnedByUserId = foundRoom->ownedByConnection->owner->guiseUserSession->userId;
     size_t indexOfOwner = 0;
     bool foundOwner = false;
 
@@ -50,12 +35,33 @@ int clvReqPing(ClvServer* self, const struct ClvUserSession* userSession, struct
     }
 
     if (!foundOwner) {
-        CLOG_C_ERROR(&self->log, "no owner of the room. panic")
+        CLOG_C_ERROR(&foundRoom->log, "no owner of the room. panic")
     }
 
     pingResponse.roomInfo.indexOfOwner = (uint8_t) indexOfOwner;
 
     clvSerializeServerOutPing(outStream, &pingResponse);
+}
+
+int clvReqPing(ClvServer* self, const struct ClvUserSession* userSession, MonotonicTimeMs now,
+               struct FldInStream* inStream, FldOutStream* outStream)
+{
+    uint64_t knowledge;
+
+    clvSerializeServerInPing(inStream, &knowledge);
+
+    ClvRoomConnection* foundRoomConnection = userSession->primaryRoomConnection;
+    if (foundRoomConnection == nullptr) {
+        CLOG_C_NOTICE(&self->log, "user has no room yet")
+        return 0;
+    }
+
+    clvRoomConnectionOnPing(foundRoomConnection, knowledge, now);
+
+    clvRoomCheckValidOwner(foundRoomConnection->ownedByRoom);
+
+    ClvRoom* foundRoom = foundRoomConnection->ownedByRoom;
+    writePingResponse(foundRoom, outStream);
 
     return 0;
 }

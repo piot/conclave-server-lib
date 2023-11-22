@@ -26,7 +26,7 @@ typedef struct ClvRooms {
 void clvRoomsInit(ClvRooms* self, struct ImprintAllocator* allocator, Clog log);
 void clvRoomsReset(ClvRooms* self);
 void clvRoomsDestroy(ClvRooms* self);
-int clvRoomsCreate(ClvRooms* self, const char* name, const struct ClvUserSession* requiredUserSession, size_t maxRoomCount,
+int clvRoomsCreate(ClvRooms* self, const char* name, size_t maxRoomCount,
                    struct ClvRoom** outRoom);
 int clvRoomsReadAndFind(ClvRooms* self, struct FldInStream* stream, struct ClvRoom** outRoom);
 

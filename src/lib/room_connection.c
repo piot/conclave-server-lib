@@ -8,8 +8,23 @@
  * Initializes a member connection.
  * @param self the member connection
  */
-void clvRoomConnectionInit(ClvRoomConnection* self, struct ClvRoom* room, const struct ClvUserSession* userSession)
+void clvRoomConnectionInit(ClvRoomConnection* self, struct ClvRoom* room, const struct ClvUserSession* userSession,
+                           MonotonicTimeMs now)
 {
     self->owner = userSession;
     self->ownedByRoom = room;
+
+    clvConnectionQualityInit(&self->connectionQuality, now);
+}
+
+void clvRoomConnectionOnPing(ClvRoomConnection* self, ClvSerializeKnowledge knowledge, MonotonicTimeMs now)
+{
+    clvConnectionQualityOnPing(&self->connectionQuality, now);
+    clvConnectionQualityUpdate(&self->connectionQuality, now);
+    self->knowledge = knowledge;
+}
+
+bool clvRoomConnectionShouldDisconnect(const ClvRoomConnection* self)
+{
+    return clvConnectionQualityShouldDisconnect(&self->connectionQuality);
 }

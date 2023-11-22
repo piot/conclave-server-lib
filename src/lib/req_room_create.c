@@ -12,7 +12,8 @@
 #include <flood/in_stream.h>
 #include <flood/out_stream.h>
 
-int clvReqRoomCreate(ClvRooms* self, ClvUserSession* foundUserSession, FldInStream* inStream, FldOutStream* outStream)
+int clvReqRoomCreate(ClvRooms* self, ClvUserSession* foundUserSession, MonotonicTimeMs now, FldInStream* inStream,
+                     FldOutStream* outStream)
 {
     char name[64];
     uint8_t numberOfPlayers;
@@ -21,8 +22,13 @@ int clvReqRoomCreate(ClvRooms* self, ClvUserSession* foundUserSession, FldInStre
     fldInStreamReadUInt8(inStream, &numberOfPlayers);
     fldInStreamReadUInt8(inStream, &flags);
 
+    if (foundUserSession->primaryRoomConnection != 0) {
+        CLOG_C_NOTICE(&self->log, "user session already have created a room")
+        return 0;
+    }
+
     ClvRoom* createdRoom;
-    int worked = clvRoomsCreate(self, name, foundUserSession, numberOfPlayers, &createdRoom);
+    int worked = clvRoomsCreate(self, name, numberOfPlayers, &createdRoom);
     if (worked < 0) {
         return worked;
     }
@@ -30,7 +36,7 @@ int clvReqRoomCreate(ClvRooms* self, ClvUserSession* foundUserSession, FldInStre
     CLOG_C_INFO(&self->log, "room create handle %zu '%s' %d", createdRoom->id, name, numberOfPlayers)
     ClvRoomConnection* createdConnection;
 
-    int errorCode = clvRoomCreateRoomConnection(createdRoom, foundUserSession, &createdConnection);
+    int errorCode = clvRoomCreateRoomConnection(createdRoom, foundUserSession, now, &createdConnection);
     if (errorCode < 0) {
         CLOG_C_WARN(&self->log, "couldn't creat room connection")
         return errorCode;

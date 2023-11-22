@@ -5,6 +5,7 @@
 #ifndef CONCLAVE_SERVER_REQ_PING_H
 #define CONCLAVE_SERVER_REQ_PING_H
 
+#include <monotonic-time/monotonic_time.h>
 #include <stdint.h>
 
 struct ClvServer;
@@ -12,7 +13,7 @@ struct FldOutStream;
 struct FldInStream;
 struct ClvUserSession;
 
-int clvReqPing(struct ClvServer* self, const struct ClvUserSession* foundUserSession, struct FldInStream* inStream,
-                   struct FldOutStream* outStream);
+int clvReqPing(struct ClvServer* self, const struct ClvUserSession* foundUserSession, MonotonicTimeMs now,
+               struct FldInStream* inStream, struct FldOutStream* outStream);
 
 #endif

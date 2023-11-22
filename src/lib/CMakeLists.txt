@@ -2,6 +2,7 @@
 cmake_minimum_required(VERSION 3.16.3)
 
 add_library(conclave-server-lib STATIC 
+  connection_quality.c
   req_list_rooms.c
   req_login.c
   req_ping.c
@@ -29,5 +30,6 @@ target_link_libraries(conclave-server-lib PUBLIC
   flood
   imprint
   monotonic-time
-  secure-random)
+  secure-random
+  stats)
 

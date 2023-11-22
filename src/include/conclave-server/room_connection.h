@@ -6,6 +6,7 @@
 #define CONCLAVE_SERVER_ROOM_CONNECTION_H
 
 #include <conclave-serialize/types.h>
+#include <conclave-server/connection_quality.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -17,9 +18,14 @@ typedef struct ClvRoomConnection {
     ClvSerializeRoomConnectionIndex id;
     const struct ClvUserSession* owner;
     struct ClvRoom* ownedByRoom;
+    ClvConnectionQuality connectionQuality;
+    ClvSerializeKnowledge knowledge;
 } ClvRoomConnection;
 
 void clvRoomConnectionInit(ClvRoomConnection* self, struct ClvRoom* ownedByRoom,
-                           const struct ClvUserSession* userSession);
+                           const struct ClvUserSession* userSession, MonotonicTimeMs now);
+
+void clvRoomConnectionOnPing(ClvRoomConnection* self, ClvSerializeKnowledge knowledge, MonotonicTimeMs now);
+bool clvRoomConnectionShouldDisconnect(const ClvRoomConnection* self);
 
 #endif

@@ -46,7 +46,7 @@ void clvRoomsDestroy(ClvRooms* self)
     }
 }
 
-int clvRoomsCreate(ClvRooms* self, const char* name, const struct ClvUserSession* requiredUserSession,
+int clvRoomsCreate(ClvRooms* self, const char* name,
                    size_t maxNumberOfMembers, ClvRoom** outSession)
 {
     for (size_t i = 1; i < self->capacity; ++i) {
@@ -56,7 +56,8 @@ int clvRoomsCreate(ClvRooms* self, const char* name, const struct ClvUserSession
             roomLog.config = self->log.config;
             tc_snprintf(room->prefix, 32, "%s/%zu", self->log.constantPrefix, i);
             roomLog.constantPrefix = room->prefix;
-            clvRoomInit(room, i, name, requiredUserSession, maxNumberOfMembers, roomLog);
+            clvRoomInit(room, i, name, maxNumberOfMembers, roomLog);
+
             CLOG_C_INFO(&self->log, "created room %zu", i)
 #if defined CLOG_LOG_ENABLED
             clvRoomDebugOutput(room);

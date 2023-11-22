@@ -6,11 +6,11 @@
 #include <conclave-serialize/commands.h>
 #include <conclave-serialize/debug.h>
 #include <conclave-server/req_list_rooms.h>
+#include <conclave-server/req_ping.h>
 #include <conclave-server/req_room_create.h>
 #include <conclave-server/req_room_join.h>
 #include <conclave-server/req_room_rejoin.h>
 #include <conclave-server/req_user_login.h>
-#include <conclave-server/req_ping.h>
 #include <conclave-server/room.h>
 #include <conclave-server/rooms.h>
 #include <conclave-server/server.h>
@@ -78,21 +78,24 @@ int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t
                 return err;
             }
             switch (data[0]) {
-                case clvSerializeCmdRoomCreate:
-                    result = clvReqRoomCreate(&self->rooms, foundUserSession, &inStream, &outStream);
-                    break;
-                case clvSerializeCmdRoomJoin:
-                    result = clvReqRoomJoin(self, (const ClvUserSession*) foundUserSession, &inStream, &outStream);
-                    break;
+                case clvSerializeCmdRoomCreate: {
+                    MonotonicTimeMs now = monotonicTimeMsNow();
+                    result = clvReqRoomCreate(&self->rooms, foundUserSession, now, &inStream, &outStream);
+                } break;
+                case clvSerializeCmdRoomJoin: {
+                    MonotonicTimeMs now = monotonicTimeMsNow();
+                    result = clvReqRoomJoin(self, (const ClvUserSession*) foundUserSession, now, &inStream, &outStream);
+                } break;
                 case clvSerializeCmdRoomReJoin:
                     result = clvReqRoomReJoin(self, (const ClvUserSession*) foundUserSession, &inStream, &outStream);
                     break;
                 case clvSerializeCmdListRooms:
                     result = clvReqListRooms(self, (const ClvUserSession*) foundUserSession, &inStream, &outStream);
                     break;
-                case clvSerializeCmdPing:
-                    result = clvReqPing(self, (const ClvUserSession*) foundUserSession, &inStream, &outStream);
-                    break;
+                case clvSerializeCmdPing: {
+                    MonotonicTimeMs now = monotonicTimeMsNow();
+                    result = clvReqPing(self, (const ClvUserSession*) foundUserSession, now, &inStream, &outStream);
+                } break;
                 default:
                     CLOG_C_SOFT_ERROR(&self->log, "clvServerFeed: unknown command %02X", data[0])
                     return 0;
