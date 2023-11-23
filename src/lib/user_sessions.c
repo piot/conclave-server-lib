@@ -16,6 +16,7 @@ void clvUserSessionsInit(ClvUserSessions* self, Clog log)
     self->log = log;
     self->userSessionCapacity = 1024;
     self->userSessions = tc_malloc_type_count(ClvUserSession, self->userSessionCapacity);
+    self->userSessionCount = 0;
     tc_mem_clear_type_n(self->userSessions, self->userSessionCapacity);
 }
 
@@ -45,12 +46,31 @@ int clvUserSessionsCreate(ClvUserSessions* sessions, const GuiseSclUserSession* 
             userSessionLog.constantPrefix = session->prefix;
             ClvSerializeUserSessionId uniqueSessionId = clvGenerateUniqueIdFromIndex(i);
             clvUserSessionInit(session, uniqueSessionId, guiseUserSession, userSessionLog);
+            sessions->userSessionCount++;
             *outSession = session;
             return 0;
         }
     }
     *outSession = 0;
     return -1;
+}
+
+void clvUserSessionsDestroySession(ClvUserSessions* self, ClvSerializeUserSessionId sessionId)
+{
+    CLOG_C_DEBUG(&self->log, "destroy user session %" PRIx64, sessionId)
+    size_t index = clvUniqueIdGetIndex(sessionId);
+    if (index >= self->userSessionCapacity) {
+        CLOG_C_ERROR(&self->log, "illegal session id")
+    }
+
+    CLOG_C_DEBUG(&self->log, "destroy user session at index %zu", index)
+
+    ClvUserSession* userSession = &self->userSessions[index];
+    CLOG_ASSERT(userSession->guiseUserSession != 0, "trying to allocate an empty user session")
+    userSession->guiseUserSession = 0;
+    userSession->userSessionId = 0;
+    userSession->userId = 0;
+    self->userSessionCount--;
 }
 
 static int userSessionsFind(const ClvUserSessions* self, ClvSerializeUserSessionId uniqueId,
@@ -62,6 +82,12 @@ static int userSessionsFind(const ClvUserSessions* self, ClvSerializeUserSession
     }
 
     ClvUserSession* foundSession = &self->userSessions[index];
+
+    if (foundSession->userSessionId == 0) {
+        CLOG_C_NOTICE(&self->log, "user session id is not valid: %" PRIX64, uniqueId)
+        return -1;
+    }
+
     if (foundSession->userSessionId != uniqueId) {
         CLOG_C_SOFT_ERROR(&self->log, "wrong user session id, got %" PRIX64 " but wanted %" PRIX64, uniqueId,
                           foundSession->userSessionId)

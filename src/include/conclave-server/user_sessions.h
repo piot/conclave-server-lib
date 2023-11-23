@@ -28,6 +28,8 @@ void clvUserSessionsDestroy(ClvUserSessions* self);
 void clvUserSessionsReset(ClvUserSessions* self);
 int clvUserSessionsCreate(ClvUserSessions* sessions, const struct GuiseSclUserSession* guiseUserSession,
                           struct ClvUserSession** outSession);
+
+void clvUserSessionsDestroySession(ClvUserSessions* self, ClvSerializeUserSessionId id);
 int clvUserSessionsReadAndFind(const ClvUserSessions* self, const GuiseSclAddress* address, struct FldInStream* stream,
                                struct ClvUserSession** outSession);
 

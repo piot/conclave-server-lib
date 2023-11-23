@@ -5,6 +5,8 @@
 #include <clog/clog.h>
 #include <conclave-server/room.h>
 #include <conclave-server/room_connection.h>
+#include <conclave-server/user_session.h>
+#include <conclave-server/user_sessions.h>
 
 static int roomCreateConnection(ClvRoom* self, const struct ClvUserSession* ownerOfConnection, MonotonicTimeMs now,
                                 ClvRoomConnection** outConnection)
@@ -52,7 +54,7 @@ void clvRoomInit(ClvRoom* self, size_t indexInRooms, const char* roomName, size_
     self->name = tc_str_dup(roomName);
     self->id = indexInRooms;
     self->ownedByConnection = 0;
-    clvRoomConnectionsInit(&self->roomConnections, maxMemberCount);
+    clvRoomConnectionsInit(&self->roomConnections, maxMemberCount, log);
 }
 
 int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foundUserSession, MonotonicTimeMs now,
@@ -81,7 +83,7 @@ int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foun
     return 0;
 }
 
-void clvRoomCheckValidOwner(ClvRoom* self)
+void clvRoomCheckValidOwner(ClvUserSessions* sessions, ClvRoom* self)
 {
     if (self->ownedByConnection == 0) {
         if (self->roomConnections.connectionCount == 0) {
@@ -97,9 +99,9 @@ void clvRoomCheckValidOwner(ClvRoom* self)
     }
 
     // Disconnect owner
-    clvRoomConnectionsDestroyConnection(&self->roomConnections, self->ownedByConnection);
+    clvUserSessionsDestroySession(sessions, self->ownedByConnection->owner->userSessionId);
+    clvRoomConnectionsDestroyConnection(&self->roomConnections, self->ownedByConnection->id);
     self->ownedByConnection = clvRoomConnectionsFindConnectionWithMostKnowledge(&self->roomConnections);
-
 }
 
 #if defined CLOG_LOG_ENABLED

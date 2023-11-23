@@ -17,6 +17,8 @@ struct ClvRoomConnection;
 #include <conclave-serialize/types.h>
 #include <stdlib.h>
 
+struct ClvUserSessions;
+
 typedef struct ClvRoom {
     size_t id;
     char* name;
@@ -32,7 +34,7 @@ void clvRoomInit(ClvRoom* self, size_t indexInRooms, const char* roomName, size_
 int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foundUserSession, MonotonicTimeMs now,
                                 struct ClvRoomConnection** outConnection);
 struct ClvRoomConnection* clvRoomFindConnection(ClvRoom* self, uint8_t connectionIndex);
-void clvRoomCheckValidOwner(ClvRoom* self);
+void clvRoomCheckValidOwner(struct ClvUserSessions* sessions, ClvRoom* self);
 void clvRoomDebugOutput(const ClvRoom* self);
 void clvRoomDestroy(ClvRoom* self);
 

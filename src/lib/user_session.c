@@ -12,4 +12,5 @@ void clvUserSessionInit(ClvUserSession* self, ClvSerializeUserSessionId id, cons
     self->userSessionId = id;
     self->userId = guiseUserSession->userId;
     self->guiseUserSession = guiseUserSession;
+    self->primaryRoomConnection = 0;
 }
