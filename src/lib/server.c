@@ -5,6 +5,7 @@
 #include <clog/clog.h>
 #include <conclave-serialize/commands.h>
 #include <conclave-serialize/debug.h>
+#include <conclave-serialize/server_out.h>
 #include <conclave-server/req_list_rooms.h>
 #include <conclave-server/req_ping.h>
 #include <conclave-server/req_room_create.h>
@@ -50,6 +51,10 @@ int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t
 #endif
 #define UDP_MAX_SIZE (1200)
     static uint8_t buf[UDP_MAX_SIZE];
+
+#define BIG_BUFFER_SIZE (UDP_MAX_SIZE * 6)
+    static uint8_t bigBuffer[BIG_BUFFER_SIZE];
+
     FldOutStream outStream;
     fldOutStreamInit(&outStream, buf, UDP_MAX_SIZE);
     int result = -1;
@@ -89,9 +94,39 @@ int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t
                 case clvSerializeCmdRoomReJoin:
                     result = clvReqRoomReJoin(self, (const ClvUserSession*) foundUserSession, &inStream, &outStream);
                     break;
-                case clvSerializeCmdListRooms:
-                    result = clvReqListRooms(self, (const ClvUserSession*) foundUserSession, &inStream, &outStream);
-                    break;
+                case clvSerializeCmdListRooms: {
+                    FldOutStream bigStream;
+                    fldOutStreamInit(&bigStream, bigBuffer, BIG_BUFFER_SIZE);
+
+                    result = clvReqListRooms(self, (const ClvUserSession*) foundUserSession, &inStream, &bigStream);
+                    datagramReassemblyWriteNextSequence(&foundUserSession->write);
+                    const int chunkSize = 1000;
+                    size_t chunkCount = bigStream.pos / chunkSize;
+                    uint16_t last = bigStream.pos % chunkSize;
+
+                    for (size_t i = 0; i < chunkCount; ++i) {
+                        fldOutStreamRewind(&outStream);
+                        fldOutStreamWriteUInt8(&outStream, clvSerializeCmdListRoomsResponse);
+                        //clvSerializeWriteUserSessionId(&outStream, foundUserSession->userSessionId);
+                        datagramReassemblyWriteHeader(&foundUserSession->write, &outStream, chunkSize,
+                                                      last == 0 && i == chunkCount - 1);
+                        uint8_t* p = bigStream.octets + i * chunkSize;
+                        fldOutStreamWriteOctets(&outStream, p, chunkSize);
+                        response->transportOut->send(response->transportOut->self, outStream.octets, outStream.pos);
+                    }
+
+                    if (last > 0) {
+                        fldOutStreamRewind(&outStream);
+                        fldOutStreamWriteUInt8(&outStream, clvSerializeCmdListRoomsResponse);
+                        //clvSerializeWriteUserSessionId(&outStream, foundUserSession->userSessionId);
+                        datagramReassemblyWriteHeader(&foundUserSession->write, &outStream, last, true);
+                        uint8_t* p = bigStream.octets + chunkCount * chunkSize;
+                        fldOutStreamWriteOctets(&outStream, p, chunkSize);
+                        response->transportOut->send(response->transportOut->self, outStream.octets, outStream.pos);
+                    }
+
+                    return 0;
+                }
                 case clvSerializeCmdPing: {
                     MonotonicTimeMs now = monotonicTimeMsNow();
                     result = clvReqPing(self, (const ClvUserSession*) foundUserSession, now, &inStream, &outStream);

@@ -33,12 +33,14 @@ int clvReqListRooms(ClvServer* self, const ClvUserSession* foundUserSession, Fld
     size_t roomCountFilledIn = 0;
     for (size_t i = 0; i < self->rooms.capacity; ++i) {
         const ClvRoom* room = &self->rooms.rooms[i];
-        if (room->ownedByConnection == 0) {
+        if (room->createdByUserSession == 0) {
             continue;
         }
         response.roomInfos[roomCountFilledIn].roomId = (ClvSerializeRoomId) room->id;
         response.roomInfos[roomCountFilledIn].applicationId = 0;
-        response.roomInfos[roomCountFilledIn].ownerUserId = room->ownedByConnection->owner->userId;
+        response.roomInfos[roomCountFilledIn].ownerUserId = room->ownedByConnection
+                                                                ? room->ownedByConnection->owner->userId
+                                                                : 0;
         response.roomInfos[roomCountFilledIn].roomName = room->name;
         roomCountFilledIn++;
         if (roomCountFilledIn >= roomCountToSend) {

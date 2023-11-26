@@ -7,9 +7,11 @@
 
 #include <clog/clog.h>
 #include <conclave-serialize/types.h>
+#include <datagram-reassembly/write.h>
 
 struct GuiseSclUserSession;
 struct ClvRoomConnection;
+struct GuiseSclUserSession;
 
 typedef struct ClvUserSession {
     ClvSerializeUserSessionId userSessionId;
@@ -18,6 +20,7 @@ typedef struct ClvUserSession {
     struct ClvRoomConnection* primaryRoomConnection;
     Clog log;
     char prefix[32];
+    DatagramReassemblyWrite write;
 } ClvUserSession;
 
 void clvUserSessionInit(ClvUserSession* self, ClvSerializeUserSessionId userSessionId,

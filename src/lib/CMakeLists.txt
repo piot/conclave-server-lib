@@ -31,5 +31,6 @@ target_link_libraries(conclave-server-lib PUBLIC
   imprint
   monotonic-time
   secure-random
+  datagram-reassembly
   stats)
 

@@ -2,8 +2,8 @@
  *  Copyright (c) Peter Bjorklund. All rights reserved. https://github.com/piot/conclave-server-lib
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------------------*/
-#include <conclave-server/connection_quality.h>
 #include <clog/clog.h>
+#include <conclave-server/connection_quality.h>
 
 void clvConnectionQualityInit(ClvConnectionQuality* self, MonotonicTimeMs now)
 {
@@ -12,8 +12,9 @@ void clvConnectionQualityInit(ClvConnectionQuality* self, MonotonicTimeMs now)
 
 int clvConnectionQualityUpdate(ClvConnectionQuality* self, MonotonicTimeMs now)
 {
-    CLOG_VERBOSE("quality: pingPerSecond: %d", self->pingsPerSecond.avg)
-    return statsIntPerSecondUpdate(&self->pingsPerSecond, now);
+    int status = statsIntPerSecondUpdate(&self->pingsPerSecond, now);
+    CLOG_VERBOSE("quality: pingPerSecond: %d isSet: %d", self->pingsPerSecond.avg, self->pingsPerSecond.avgIsSet)
+    return status;
 }
 
 /// checks if the connection has been decided to be disconnected
@@ -27,5 +28,5 @@ bool clvConnectionQualityShouldDisconnect(const ClvConnectionQuality* self)
 void clvConnectionQualityOnPing(ClvConnectionQuality* self, MonotonicTimeMs now)
 {
     self->lastPingAt = now;
-    statsIntPerSecondAdd(&self->pingsPerSecond, 1);
+    statsIntPerSecondAdd(&self->pingsPerSecond, 2); // TODO: SHOULD BE 1
 }

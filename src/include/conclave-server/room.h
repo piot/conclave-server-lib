@@ -18,6 +18,7 @@ struct ClvRoomConnection;
 #include <stdlib.h>
 
 struct ClvUserSessions;
+struct GuiseSclUserSession;
 
 typedef struct ClvRoom {
     size_t id;
@@ -26,11 +27,13 @@ typedef struct ClvRoom {
     // const struct ClvUserSession* ownedByConclaveSession;
     ClvRoomConnections roomConnections;
     struct ClvRoomConnection* ownedByConnection;
+    const struct GuiseSclUserSession* createdByUserSession;
     Clog log;
     char prefix[16];
 } ClvRoom;
 
-void clvRoomInit(ClvRoom* self, size_t indexInRooms, const char* roomName, size_t maxMemberCount, Clog log);
+void clvRoomInit(ClvRoom* self, const struct GuiseSclUserSession* createdByUserSession, size_t indexInRooms,
+                 const char* roomName, size_t maxMemberCount, Clog log);
 int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foundUserSession, MonotonicTimeMs now,
                                 struct ClvRoomConnection** outConnection);
 struct ClvRoomConnection* clvRoomFindConnection(ClvRoom* self, uint8_t connectionIndex);

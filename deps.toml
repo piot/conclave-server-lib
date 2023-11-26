@@ -27,6 +27,9 @@ version = "*"
 name = 'piot/secure-random-c'
 version = "*"
 
+[[dependencies]]
+name = 'piot/datagram-reassembly'
+version = "*"
 
 [[dependencies]]
 name = 'piot/stats-c'

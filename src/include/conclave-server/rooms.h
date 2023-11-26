@@ -13,6 +13,7 @@ struct FldInStream;
 struct ClvUserSession;
 struct ClvRoomConnection;
 struct ImprintAllocator;
+struct GuiseSclUserSession;
 
 typedef struct ClvRooms {
     struct ClvRoom* rooms;
@@ -26,7 +27,7 @@ typedef struct ClvRooms {
 void clvRoomsInit(ClvRooms* self, struct ImprintAllocator* allocator, Clog log);
 void clvRoomsReset(ClvRooms* self);
 void clvRoomsDestroy(ClvRooms* self);
-int clvRoomsCreate(ClvRooms* self, const char* name, size_t maxRoomCount,
+int clvRoomsCreate(ClvRooms* self, const struct GuiseSclUserSession* createdByUserSession, const char* name, size_t maxRoomCount,
                    struct ClvRoom** outRoom);
 int clvRoomsReadAndFind(ClvRooms* self, struct FldInStream* stream, struct ClvRoom** outRoom);
 

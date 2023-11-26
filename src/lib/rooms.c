@@ -11,6 +11,7 @@
 #include <flood/in_stream.h>
 #include <imprint/allocator.h>
 #include <inttypes.h>
+#include <guise-sessions-client/client.h>
 
 void clvRoomsInit(ClvRooms* self, struct ImprintAllocator* allocator, Clog log)
 {
@@ -46,17 +47,17 @@ void clvRoomsDestroy(ClvRooms* self)
     }
 }
 
-int clvRoomsCreate(ClvRooms* self, const char* name,
+int clvRoomsCreate(ClvRooms* self, const struct GuiseSclUserSession* createdByUserSession, const char* name,
                    size_t maxNumberOfMembers, ClvRoom** outSession)
 {
     for (size_t i = 1; i < self->capacity; ++i) {
         ClvRoom* room = &self->rooms[i];
-        if (room->name == 0) {
+        if (room->createdByUserSession == 0) {
             Clog roomLog;
             roomLog.config = self->log.config;
             tc_snprintf(room->prefix, 32, "%s/%zu", self->log.constantPrefix, i);
             roomLog.constantPrefix = room->prefix;
-            clvRoomInit(room, i, name, maxNumberOfMembers, roomLog);
+            clvRoomInit(room, createdByUserSession, i, name, maxNumberOfMembers, roomLog);
 
             CLOG_C_INFO(&self->log, "created room %zu", i)
 #if defined CLOG_LOG_ENABLED

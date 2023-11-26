@@ -11,6 +11,7 @@
 #include <conclave-server/user_session.h>
 #include <flood/in_stream.h>
 #include <flood/out_stream.h>
+#include <guise-sessions-client/client.h>
 
 int clvReqRoomCreate(ClvRooms* self, ClvUserSession* foundUserSession, MonotonicTimeMs now, FldInStream* inStream,
                      FldOutStream* outStream)
@@ -28,7 +29,7 @@ int clvReqRoomCreate(ClvRooms* self, ClvUserSession* foundUserSession, Monotonic
     }
 
     ClvRoom* createdRoom;
-    int worked = clvRoomsCreate(self, name, numberOfPlayers, &createdRoom);
+    int worked = clvRoomsCreate(self, foundUserSession->guiseUserSession, name, numberOfPlayers, &createdRoom);
     if (worked < 0) {
         return worked;
     }
@@ -43,6 +44,7 @@ int clvReqRoomCreate(ClvRooms* self, ClvUserSession* foundUserSession, Monotonic
     }
 
     foundUserSession->primaryRoomConnection = createdConnection;
+    createdRoom->ownedByConnection = createdConnection;
 
     return clvSerializeServerOutRoomCreate(outStream, (ClvSerializeRoomId) createdRoom->id, createdConnection->id);
 }
