@@ -57,15 +57,21 @@ int clvReqPing(ClvServer* self, const struct ClvUserSession* userSession, Monoto
     }
 
     clvRoomConnectionOnPing(foundRoomConnection, knowledge, now);
+    ClvRoom* room = foundRoomConnection->ownedByRoom;
 
-    clvRoomCheckValidOwner(&self->userSessions, foundRoomConnection->ownedByRoom);
+    clvRoomCheckForDisconnections(&self->userSessions, room);
+
+    // If owner connection is disconnected or no owner is assigned
+    if (room->ownedByConnection == 0 || room->ownedByConnection->owner == 0) {
+        clvRoomSelectNewOwner(room);
+    }
+
     if (foundRoomConnection->owner == 0) {
         // TODO: Send ping response that connection is deleted
         return 0;
     }
 
-    ClvRoom* foundRoom = foundRoomConnection->ownedByRoom;
-    writePingResponse(foundRoom, outStream);
+    writePingResponse(room, outStream);
 
     return 0;
 }

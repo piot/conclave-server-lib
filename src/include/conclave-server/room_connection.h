@@ -14,12 +14,19 @@ struct ClvUserSession;
 struct ImprintAllocator;
 struct ClvRoom;
 
+typedef enum ClvRoomConnectionState {
+    ClvRoomConnectionStateNormal,
+    ClvRoomConnectionStateWaitingForReconnect,
+    ClvRoomConnectionStateDisconnected
+} ClvRoomConnectionState;
+
 typedef struct ClvRoomConnection {
     ClvSerializeRoomConnectionIndex id;
     const struct ClvUserSession* owner;
     struct ClvRoom* ownedByRoom;
     ClvConnectionQuality connectionQuality;
     ClvSerializeKnowledge knowledge;
+    ClvRoomConnectionState state;
 } ClvRoomConnection;
 
 void clvRoomConnectionInit(ClvRoomConnection* self, struct ClvRoom* ownedByRoom,

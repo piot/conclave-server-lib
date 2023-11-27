@@ -49,6 +49,15 @@ int clvRoomConnectionsFindConnection(ClvRoomConnections* self, const struct ClvU
     return 0;
 }
 
+ClvRoomConnection* clvRoomConnectionsFindConnectionFromIndex(ClvRoomConnections* self, uint8_t connectionIndex)
+{
+    if (connectionIndex >= self->connectionCount) {
+        return 0;
+    }
+
+    return &self->connections[connectionIndex];
+}
+
 ClvRoomConnection* clvRoomConnectionsFindConnectionWithMostKnowledge(ClvRoomConnections* self)
 {
     CLOG_C_DEBUG(&self->log, "find connection with most knowledge. connection count: %zu", self->connectionCount)

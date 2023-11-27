@@ -11,7 +11,7 @@
 #include <flood/in_stream.h>
 #include <flood/out_stream.h>
 
-int clvReqRoomJoin(ClvServer* self, const ClvUserSession* foundUserSession, MonotonicTimeMs now, FldInStream* inStream,
+int clvReqRoomJoin(ClvServer* self, ClvUserSession* foundUserSession, MonotonicTimeMs now, FldInStream* inStream,
                    FldOutStream* outStream)
 {
     ClvRoom* foundRoom;
@@ -20,13 +20,26 @@ int clvReqRoomJoin(ClvServer* self, const ClvUserSession* foundUserSession, Mono
         CLOG_C_WARN(&self->log, "couldn't find room")
         return errorCode;
     }
-    ClvRoomConnection* createdConnection;
 
+    ClvRoomConnection* existingConnection;
+    errorCode = clvRoomConnectionsFindConnection(&foundRoom->roomConnections, foundUserSession, &existingConnection);
+    if (errorCode < 0) {
+        CLOG_C_WARN(&self->log, "couldn't find connection")
+        return errorCode;
+    }
+    if (errorCode > 0 && existingConnection != 0) {
+        existingConnection->state = ClvRoomConnectionStateNormal;
+        return 0;
+    }
+
+    ClvRoomConnection* createdConnection;
     errorCode = clvRoomCreateRoomConnection(foundRoom, foundUserSession, now, &createdConnection);
     if (errorCode < 0) {
         CLOG_C_WARN(&self->log, "couldn't join room")
         return errorCode;
     }
+
+    foundUserSession->primaryRoomConnection = createdConnection;
 
     CLOG_C_DEBUG(&self->log, "joined room %lu", foundRoom->id)
     clvSerializeServerOutRoomJoin(outStream, (ClvSerializeRoomId) foundRoom->id, createdConnection->id);

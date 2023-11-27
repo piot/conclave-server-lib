@@ -47,8 +47,8 @@ typedef struct ClvRoomConfig {
 void clvRoomInit(ClvRoom* self, const ClvRoomConfig* config);
 int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foundUserSession, MonotonicTimeMs now,
                                 struct ClvRoomConnection** outConnection);
-struct ClvRoomConnection* clvRoomFindConnection(ClvRoom* self, uint8_t connectionIndex);
-void clvRoomCheckValidOwner(struct ClvUserSessions* sessions, ClvRoom* self);
+void clvRoomCheckForDisconnections(struct ClvUserSessions* sessions, ClvRoom* self);
+void clvRoomSelectNewOwner(ClvRoom* self);
 void clvRoomDebugOutput(const ClvRoom* self);
 void clvRoomDestroy(ClvRoom* self);
 

@@ -24,6 +24,8 @@ int clvReqRoomReJoin(ClvServer* self, const struct ClvUserSession* userSession, 
         return errorCode;
     }
 
+    foundRoomConnection->state = ClvRoomConnectionStateNormal;
+
     clvSerializeWriteCommand(outStream, clvSerializeCmdRoomReJoinResponse, "ServerOut");
 
     // TODO: send connection and member Ids

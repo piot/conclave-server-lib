@@ -39,14 +39,6 @@ void clvRoomDestroy(ClvRoom* self)
     clvRoomConnectionsDestroy(&self->roomConnections);
 }
 
-ClvRoomConnection* clvRoomFindConnection(ClvRoom* self, uint8_t connectionIndex)
-{
-    if (connectionIndex >= self->roomConnections.connectionCount) {
-        return 0;
-    }
-
-    return &self->roomConnections.connections[connectionIndex];
-}
 
 void clvRoomInit(ClvRoom* self, const ClvRoomConfig* config)
 {
@@ -86,7 +78,7 @@ int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foun
     return 0;
 }
 
-void clvRoomCheckValidOwner(ClvUserSessions* sessions, ClvRoom* self)
+void clvRoomSelectNewOwner(ClvRoom* self)
 {
     if (self->ownedByConnection == 0) {
         if (self->roomConnections.connectionCount == 0) {
@@ -96,15 +88,22 @@ void clvRoomCheckValidOwner(ClvUserSessions* sessions, ClvRoom* self)
         return;
     }
 
-    bool shouldDisconnect = clvRoomConnectionShouldDisconnect(self->ownedByConnection);
-    if (!shouldDisconnect) {
-        return;
-    }
-
-    // Disconnect owner
-    clvUserSessionsDestroySession(sessions, self->ownedByConnection->owner->userSessionId);
-    clvRoomConnectionsDestroyConnection(&self->roomConnections, self->ownedByConnection->id);
     self->ownedByConnection = clvRoomConnectionsFindConnectionWithMostKnowledge(&self->roomConnections);
+}
+
+void clvRoomCheckForDisconnections(ClvUserSessions* sessions, ClvRoom* self)
+{
+    for (size_t i = 0; i < self->roomConnections.connectionCount; ++i) {
+        const ClvRoomConnection* roomConnection = &self->roomConnections.connections[i];
+        bool shouldDisconnect = clvRoomConnectionShouldDisconnect(roomConnection);
+        if (!shouldDisconnect) {
+            continue;
+        }
+
+        // Disconnect owner
+        clvUserSessionsDestroySession(sessions, roomConnection->owner->userSessionId);
+        clvRoomConnectionsDestroyConnection(&self->roomConnections, roomConnection->id);
+    }
 }
 
 #if defined CLOG_LOG_ENABLED

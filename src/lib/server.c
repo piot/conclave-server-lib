@@ -89,7 +89,7 @@ int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t
                 } break;
                 case clvSerializeCmdRoomJoin: {
                     MonotonicTimeMs now = monotonicTimeMsNow();
-                    result = clvReqRoomJoin(self, (const ClvUserSession*) foundUserSession, now, &inStream, &outStream);
+                    result = clvReqRoomJoin(self, foundUserSession, now, &inStream, &outStream);
                 } break;
                 case clvSerializeCmdRoomReJoin:
                     result = clvReqRoomReJoin(self, (const ClvUserSession*) foundUserSession, &inStream, &outStream);
@@ -107,7 +107,7 @@ int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t
                     for (size_t i = 0; i < chunkCount; ++i) {
                         fldOutStreamRewind(&outStream);
                         clvSerializeWriteCommand(&outStream, clvSerializeCmdListRoomsResponse, "");
-                        //clvSerializeWriteUserSessionId(&outStream, foundUserSession->userSessionId);
+                        // clvSerializeWriteUserSessionId(&outStream, foundUserSession->userSessionId);
                         datagramReassemblyWriteHeader(&foundUserSession->write, &outStream, chunkSize,
                                                       last == 0 && i == chunkCount - 1);
                         uint8_t* p = bigStream.octets + i * chunkSize;
@@ -118,7 +118,7 @@ int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t
                     if (last > 0) {
                         fldOutStreamRewind(&outStream);
                         clvSerializeWriteCommand(&outStream, clvSerializeCmdListRoomsResponse, "");
-                        //clvSerializeWriteUserSessionId(&outStream, foundUserSession->userSessionId);
+                        // clvSerializeWriteUserSessionId(&outStream, foundUserSession->userSessionId);
                         datagramReassemblyWriteHeader(&foundUserSession->write, &outStream, last, true);
                         uint8_t* p = bigStream.octets + chunkCount * chunkSize;
                         fldOutStreamWriteOctets(&outStream, p, chunkSize);
