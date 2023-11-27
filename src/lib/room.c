@@ -48,15 +48,16 @@ ClvRoomConnection* clvRoomFindConnection(ClvRoom* self, uint8_t connectionIndex)
     return &self->roomConnections.connections[connectionIndex];
 }
 
-void clvRoomInit(ClvRoom* self, const struct GuiseSclUserSession* createdByUserSession, size_t indexInRooms,
-                 const char* roomName, size_t maxMemberCount, Clog log)
+void clvRoomInit(ClvRoom* self, const ClvRoomConfig* config)
 {
-    self->log = log;
-    self->name = tc_str_dup(roomName);
-    self->id = indexInRooms;
+    self->applicationId = config->applicationId;
+    self->applicationVersion = config->applicationVersion;
+    self->log = config->log;
+    tc_strcpy(self->name, 64, config->roomName);
+    self->id = config->indexInRooms;
     self->ownedByConnection = 0;
-    self->createdByUserSession = createdByUserSession;
-    clvRoomConnectionsInit(&self->roomConnections, maxMemberCount, log);
+    self->createdByUserSession = config->createdByUserSession;
+    clvRoomConnectionsInit(&self->roomConnections, config->maxMemberCount, config->log);
 }
 
 int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foundUserSession, MonotonicTimeMs now,

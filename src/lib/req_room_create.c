@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------------------*/
 #include <clog/clog.h>
+#include <conclave-serialize/server_in.h>
 #include <conclave-serialize/server_out.h>
 #include <conclave-server/req_room_create.h>
 #include <conclave-server/room.h>
@@ -16,12 +17,12 @@
 int clvReqRoomCreate(ClvRooms* self, ClvUserSession* foundUserSession, MonotonicTimeMs now, FldInStream* inStream,
                      FldOutStream* outStream)
 {
-    char name[64];
-    uint8_t numberOfPlayers;
-    uint8_t flags;
-    clvSerializeReadString(inStream, name, 64);
-    fldInStreamReadUInt8(inStream, &numberOfPlayers);
-    fldInStreamReadUInt8(inStream, &flags);
+    ClvSerializeRoomCreateOptions createRoomOptions;
+
+    int deserializeResult = clvSerializeServerInCreateRoom(inStream, &createRoomOptions);
+    if (deserializeResult < 0) {
+        return deserializeResult;
+    }
 
     if (foundUserSession->primaryRoomConnection != 0) {
         CLOG_C_NOTICE(&self->log, "user session already have created a room")
@@ -29,14 +30,23 @@ int clvReqRoomCreate(ClvRooms* self, ClvUserSession* foundUserSession, Monotonic
     }
 
     ClvRoom* createdRoom;
-    int worked = clvRoomsCreate(self, foundUserSession->guiseUserSession, name, numberOfPlayers, &createdRoom);
+
+    ClvRoomCreateData data;
+    data.applicationId = createRoomOptions.applicationId;
+    data.applicationVersion = createRoomOptions.applicationVersion;
+    data.createdByUserSession = foundUserSession->guiseUserSession;
+    data.roomName = createRoomOptions.name;
+    data.maxMemberCount = createRoomOptions.maxNumberOfPlayers;
+
+    int worked = clvRoomsCreate(self, &data, &createdRoom);
     if (worked < 0) {
         return worked;
     }
 
-    CLOG_C_INFO(&self->log, "room create handle %zu '%s' %d", createdRoom->id, name, numberOfPlayers)
-    ClvRoomConnection* createdConnection;
+    CLOG_C_INFO(&self->log, "room create handle %zu '%s' %d", createdRoom->id, createRoomOptions.name,
+                createRoomOptions.maxNumberOfPlayers)
 
+    ClvRoomConnection* createdConnection;
     int errorCode = clvRoomCreateRoomConnection(createdRoom, foundUserSession, now, &createdConnection);
     if (errorCode < 0) {
         CLOG_C_WARN(&self->log, "couldn't creat room connection")

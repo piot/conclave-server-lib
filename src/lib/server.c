@@ -106,7 +106,7 @@ int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t
 
                     for (size_t i = 0; i < chunkCount; ++i) {
                         fldOutStreamRewind(&outStream);
-                        fldOutStreamWriteUInt8(&outStream, clvSerializeCmdListRoomsResponse);
+                        clvSerializeWriteCommand(&outStream, clvSerializeCmdListRoomsResponse, "");
                         //clvSerializeWriteUserSessionId(&outStream, foundUserSession->userSessionId);
                         datagramReassemblyWriteHeader(&foundUserSession->write, &outStream, chunkSize,
                                                       last == 0 && i == chunkCount - 1);
@@ -117,7 +117,7 @@ int clvServerFeed(ClvServer* self, const GuiseSclAddress* address, const uint8_t
 
                     if (last > 0) {
                         fldOutStreamRewind(&outStream);
-                        fldOutStreamWriteUInt8(&outStream, clvSerializeCmdListRoomsResponse);
+                        clvSerializeWriteCommand(&outStream, clvSerializeCmdListRoomsResponse, "");
                         //clvSerializeWriteUserSessionId(&outStream, foundUserSession->userSessionId);
                         datagramReassemblyWriteHeader(&foundUserSession->write, &outStream, last, true);
                         uint8_t* p = bigStream.octets + chunkCount * chunkSize;

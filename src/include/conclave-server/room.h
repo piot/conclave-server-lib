@@ -22,7 +22,9 @@ struct GuiseSclUserSession;
 
 typedef struct ClvRoom {
     size_t id;
-    char* name;
+    ClvSerializeApplicationId applicationId;
+    ClvSerializeApplicationVersion applicationVersion;
+    char name[64];
     const char* passcode;
     // const struct ClvUserSession* ownedByConclaveSession;
     ClvRoomConnections roomConnections;
@@ -32,8 +34,17 @@ typedef struct ClvRoom {
     char prefix[16];
 } ClvRoom;
 
-void clvRoomInit(ClvRoom* self, const struct GuiseSclUserSession* createdByUserSession, size_t indexInRooms,
-                 const char* roomName, size_t maxMemberCount, Clog log);
+typedef struct ClvRoomConfig {
+    const struct GuiseSclUserSession* createdByUserSession;
+    ClvSerializeApplicationId applicationId;
+    ClvSerializeApplicationVersion applicationVersion;
+    size_t indexInRooms;
+    const char* roomName;
+    size_t maxMemberCount;
+    Clog log;
+} ClvRoomConfig;
+
+void clvRoomInit(ClvRoom* self, const ClvRoomConfig* config);
 int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foundUserSession, MonotonicTimeMs now,
                                 struct ClvRoomConnection** outConnection);
 struct ClvRoomConnection* clvRoomFindConnection(ClvRoom* self, uint8_t connectionIndex);

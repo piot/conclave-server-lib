@@ -9,9 +9,9 @@
 #include <conclave-server/rooms.h>
 #include <conclave-server/user_session.h>
 #include <flood/in_stream.h>
+#include <guise-sessions-client/client.h>
 #include <imprint/allocator.h>
 #include <inttypes.h>
-#include <guise-sessions-client/client.h>
 
 void clvRoomsInit(ClvRooms* self, struct ImprintAllocator* allocator, Clog log)
 {
@@ -30,10 +30,7 @@ void clvRoomsReset(ClvRooms* self)
 {
     for (size_t i = 0; i < self->capacity; ++i) {
         ClvRoom* room = &self->rooms[i];
-        if (room->name) {
-            tc_free((void*) room->name);
-            room->name = 0;
-        }
+        room->name[0] = 0;
         clvRoomConnectionsDestroy(&room->roomConnections);
     }
     self->count = 0;
@@ -47,8 +44,7 @@ void clvRoomsDestroy(ClvRooms* self)
     }
 }
 
-int clvRoomsCreate(ClvRooms* self, const struct GuiseSclUserSession* createdByUserSession, const char* name,
-                   size_t maxNumberOfMembers, ClvRoom** outSession)
+int clvRoomsCreate(ClvRooms* self, const ClvRoomCreateData* data, ClvRoom** outSession)
 {
     for (size_t i = 1; i < self->capacity; ++i) {
         ClvRoom* room = &self->rooms[i];
@@ -57,7 +53,17 @@ int clvRoomsCreate(ClvRooms* self, const struct GuiseSclUserSession* createdByUs
             roomLog.config = self->log.config;
             tc_snprintf(room->prefix, 32, "%s/%zu", self->log.constantPrefix, i);
             roomLog.constantPrefix = room->prefix;
-            clvRoomInit(room, createdByUserSession, i, name, maxNumberOfMembers, roomLog);
+
+            ClvRoomConfig config;
+            config.applicationId = data->applicationId;
+            config.applicationVersion = data->applicationVersion;
+            config.createdByUserSession = data->createdByUserSession;
+            config.indexInRooms = i;
+            config.log = roomLog;
+            config.maxMemberCount = data->maxMemberCount;
+            config.roomName = data->roomName;
+
+            clvRoomInit(room, &config);
 
             CLOG_C_INFO(&self->log, "created room %zu", i)
 #if defined CLOG_LOG_ENABLED

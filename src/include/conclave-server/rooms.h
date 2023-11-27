@@ -5,8 +5,8 @@
 #ifndef CONCLAVE_SERVER_ROOMS_H
 #define CONCLAVE_SERVER_ROOMS_H
 
-#include <stdlib.h>
 #include <clog/clog.h>
+#include <stdlib.h>
 
 struct ClvRoom;
 struct FldInStream;
@@ -24,13 +24,21 @@ typedef struct ClvRooms {
     Clog log;
 } ClvRooms;
 
+typedef struct ClvRoomCreateData {
+    const struct GuiseSclUserSession* createdByUserSession;
+    ClvSerializeApplicationId applicationId;
+    ClvSerializeApplicationVersion applicationVersion;
+    const char* roomName;
+    size_t maxMemberCount;
+} ClvRoomCreateData;
+
 void clvRoomsInit(ClvRooms* self, struct ImprintAllocator* allocator, Clog log);
 void clvRoomsReset(ClvRooms* self);
 void clvRoomsDestroy(ClvRooms* self);
-int clvRoomsCreate(ClvRooms* self, const struct GuiseSclUserSession* createdByUserSession, const char* name, size_t maxRoomCount,
-                   struct ClvRoom** outRoom);
+int clvRoomsCreate(ClvRooms* self, const ClvRoomCreateData* data, struct ClvRoom** outRoom);
 int clvRoomsReadAndFind(ClvRooms* self, struct FldInStream* stream, struct ClvRoom** outRoom);
 
-int clvRoomsReadAndFindRoomConnection(ClvRooms* self, struct FldInStream* stream, const struct ClvUserSession* requiredUserSession,
+int clvRoomsReadAndFindRoomConnection(ClvRooms* self, struct FldInStream* stream,
+                                      const struct ClvUserSession* requiredUserSession,
                                       struct ClvRoomConnection** outRoomConnection);
 #endif
