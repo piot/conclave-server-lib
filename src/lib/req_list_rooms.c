@@ -38,7 +38,7 @@ int clvReqListRooms(ClvServer* self, const ClvUserSession* foundUserSession, Fld
         }
         ClvSerializeRoomInfo* info = &response.roomInfos[roomCountFilledIn];
         info->roomId = (ClvSerializeRoomId) room->id;
-        info->applicationId = room->applicationId;;
+        info->applicationId = room->applicationId;
         info->applicationVersion = room->applicationVersion;
         info->ownerUserId = room->ownedByConnection ? room->ownedByConnection->owner->userId : 0;
         info->roomName = room->name;
