@@ -21,7 +21,12 @@ static int roomCreateConnection(ClvRoom* self, const struct ClvUserSession* owne
                 CLOG_C_ERROR(&self->log, "could not create a connection in the room, owner is null")
             }
             roomConnection->id = (ClvSerializeRoomConnectionIndex) i;
-            clvRoomConnectionInit(roomConnection, self, ownerOfConnection, now);
+
+            tc_snprintf(roomConnection->logNamePrefix, sizeof(roomConnection->logNamePrefix), "connections/%zu", i);
+            Clog sublog;
+            sublog.config = self->log.config;
+            sublog.constantPrefix = roomConnection->logNamePrefix;
+            clvRoomConnectionInit(roomConnection, self, ownerOfConnection, now, sublog);
             connections->connectionCount++;
 
             *outConnection = roomConnection;
@@ -88,18 +93,23 @@ void clvRoomSelectNewOwner(ClvRoom* self, const ClvRoomConnection* excludeConnec
         }
         self->ownedByConnection = &self->roomConnections.connections[0];
         self->term++;
+        self->version++;
         return;
     }
 
     self->ownedByConnection = clvRoomConnectionsFindConnectionWithMostKnowledge(&self->roomConnections,
                                                                                 excludeConnection);
     self->term++;
+    self->version++;
 }
 
 void clvRoomCheckForDisconnections(ClvUserSessions* sessions, ClvRoom* self)
 {
-    for (size_t i = 0; i < self->roomConnections.connectionCount; ++i) {
+    for (size_t i = 0; i < self->roomConnections.capacityCount; ++i) {
         const ClvRoomConnection* roomConnection = &self->roomConnections.connections[i];
+        if (roomConnection->owner == 0) {
+            continue;
+        }
         bool shouldDisconnect = clvRoomConnectionShouldDisconnect(roomConnection);
         if (!shouldDisconnect) {
             continue;

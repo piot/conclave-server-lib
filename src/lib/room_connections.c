@@ -65,7 +65,6 @@ ClvRoomConnection* clvRoomConnectionsFindConnectionWithMostKnowledge(ClvRoomConn
     ClvRoomConnection* bestConnection = 0;
 
     for (size_t i = 0; i < self->capacityCount; ++i) {
-        CLOG_C_VERBOSE(&self->log, "checking connection index: %zu", i)
         ClvRoomConnection* roomConnection = &self->connections[i];
         if (roomConnection->owner == 0) {
             continue;
@@ -75,7 +74,9 @@ ClvRoomConnection* clvRoomConnectionsFindConnectionWithMostKnowledge(ClvRoomConn
             bestConnection = roomConnection;
         }
     }
-
+    if (bestConnection != 0) {
+        CLOG_C_DEBUG(&self->log, "best connection is %hhu", bestConnection->id)
+    }
     return bestConnection;
 }
 
@@ -83,7 +84,6 @@ bool clvRoomConnectionsHaveMostLostConnectionToOwner(const ClvRoomConnections* s
 {
     size_t votesForDisconnect = 0;
     for (size_t i = 0; i < self->capacityCount; ++i) {
-        CLOG_C_VERBOSE(&self->log, "checking connection index: %zu", i)
         ClvRoomConnection* roomConnection = &self->connections[i];
         if (roomConnection->owner == 0) {
             continue;
@@ -99,7 +99,6 @@ bool clvRoomConnectionsHaveMostLostConnectionToOwner(const ClvRoomConnections* s
 void clvRoomConnectionsUpdate(ClvRoomConnections* self, MonotonicTimeMs now)
 {
     for (size_t i = 0; i < self->capacityCount; ++i) {
-        CLOG_C_VERBOSE(&self->log, "checking connection index: %zu", i)
         ClvRoomConnection* roomConnection = &self->connections[i];
         if (roomConnection->owner == 0) {
             continue;

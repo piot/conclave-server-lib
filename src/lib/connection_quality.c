@@ -5,15 +5,17 @@
 #include <clog/clog.h>
 #include <conclave-server/connection_quality.h>
 
-void clvConnectionQualityInit(ClvConnectionQuality* self, MonotonicTimeMs now)
+void clvConnectionQualityInit(ClvConnectionQuality* self, MonotonicTimeMs now, Clog log)
 {
-    statsIntPerSecondInit(&self->pingsPerSecond, now, 1000);
+    self->log = log;
+    statsIntPerSecondInit(&self->pingsPerSecond, now, 5000);
 }
 
 int clvConnectionQualityUpdate(ClvConnectionQuality* self, MonotonicTimeMs now)
 {
     int status = statsIntPerSecondUpdate(&self->pingsPerSecond, now);
-    CLOG_VERBOSE("quality: pingPerSecond: %d isSet: %d", self->pingsPerSecond.avg, self->pingsPerSecond.avgIsSet)
+    CLOG_C_VERBOSE(&self->log, "quality: pingPerSecond: %d isSet: %d", self->pingsPerSecond.avg,
+                   self->pingsPerSecond.avgIsSet)
     return status;
 }
 

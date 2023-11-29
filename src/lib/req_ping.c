@@ -20,17 +20,22 @@
 static void writePingResponse(ClvRoom* foundRoom, FldOutStream* outStream)
 {
     ClvSerializePingResponseOptions pingResponse;
-    pingResponse.roomInfo.memberCount = foundRoom->roomConnections.connectionCount;
+    pingResponse.roomInfo.memberCount = 0;
 
     GuiseSerializeUserId roomOwnedByUserId = foundRoom->ownedByConnection->owner->guiseUserSession->userId;
     size_t indexOfOwner = 0;
     bool foundOwner = false;
 
-    for (size_t i = 0; i < pingResponse.roomInfo.memberCount; ++i) {
-        pingResponse.roomInfo.members[i] = foundRoom->roomConnections.connections[i].owner->userId;
-        if (roomOwnedByUserId == pingResponse.roomInfo.members[i]) {
+    for (size_t i = 0; i < foundRoom->roomConnections.capacityCount; ++i) {
+        ClvRoomConnection* roomConnection = &foundRoom->roomConnections.connections[i];
+        if (roomConnection->owner == 0) {
+            continue;
+        }
+        size_t index = pingResponse.roomInfo.memberCount++;
+        pingResponse.roomInfo.members[index] = roomConnection->owner->userId;
+        if (roomOwnedByUserId == roomConnection->owner->userId) {
             foundOwner = true;
-            indexOfOwner = i;
+            indexOfOwner = index;
         }
     }
 

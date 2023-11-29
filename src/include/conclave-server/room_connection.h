@@ -5,6 +5,7 @@
 #ifndef CONCLAVE_SERVER_ROOM_CONNECTION_H
 #define CONCLAVE_SERVER_ROOM_CONNECTION_H
 
+#include <clog/clog.h>
 #include <conclave-serialize/types.h>
 #include <conclave-server/connection_quality.h>
 #include <stdbool.h>
@@ -29,10 +30,12 @@ typedef struct ClvRoomConnection {
     ClvSerializeKnowledge knowledge;
     ClvRoomConnectionState state;
     ClvSerializeConnectedToOwnerState hasConnectionToOwner;
+    char logNamePrefix[20];
+    Clog log;
 } ClvRoomConnection;
 
 void clvRoomConnectionInit(ClvRoomConnection* self, struct ClvRoom* ownedByRoom,
-                           const struct ClvUserSession* userSession, MonotonicTimeMs now);
+                           const struct ClvUserSession* userSession, MonotonicTimeMs now, Clog log);
 void clvRoomConnectionOnPing(ClvRoomConnection* self, ClvSerializeKnowledge knowledge, MonotonicTimeMs now);
 void clvRoomConnectionUpdate(ClvRoomConnection* self, MonotonicTimeMs now);
 bool clvRoomConnectionShouldDisconnect(const ClvRoomConnection* self);

@@ -9,13 +9,14 @@
  * @param self the member connection
  */
 void clvRoomConnectionInit(ClvRoomConnection* self, struct ClvRoom* room, const struct ClvUserSession* userSession,
-                           MonotonicTimeMs now)
+                           MonotonicTimeMs now, Clog log)
 {
+    self->log = log;
     self->owner = userSession;
     self->ownedByRoom = room;
     self->hasConnectionToOwner = false;
 
-    clvConnectionQualityInit(&self->connectionQuality, now);
+    clvConnectionQualityInit(&self->connectionQuality, now, log);
 }
 
 void clvRoomConnectionOnPing(ClvRoomConnection* self, ClvSerializeKnowledge knowledge, MonotonicTimeMs now)
