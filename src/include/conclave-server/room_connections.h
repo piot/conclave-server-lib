@@ -9,6 +9,7 @@
 #include <conclave-serialize/types.h>
 #include <monotonic-time/monotonic_time.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 struct ClvRoomConnection;
 struct ClvUserSession;
@@ -26,6 +27,8 @@ int clvRoomConnectionsFindConnection(ClvRoomConnections* self, const struct ClvU
                                      struct ClvRoomConnection** outConnection);
 struct ClvRoomConnection* clvRoomConnectionsFindConnectionFromIndex(ClvRoomConnections* self, uint8_t connectionIndex);
 void clvRoomConnectionsDestroyConnection(ClvRoomConnections* self, ClvSerializeRoomConnectionIndex index);
-struct ClvRoomConnection* clvRoomConnectionsFindConnectionWithMostKnowledge(ClvRoomConnections* self);
+struct ClvRoomConnection* clvRoomConnectionsFindConnectionWithMostKnowledge(ClvRoomConnections* self, const struct ClvRoomConnection* excludeConnection);
+bool clvRoomConnectionsHaveMostLostConnectionToOwner(const ClvRoomConnections* self);
+void clvRoomConnectionsUpdate(ClvRoomConnections* self, MonotonicTimeMs now);
 
 #endif

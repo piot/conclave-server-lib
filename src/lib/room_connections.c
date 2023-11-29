@@ -51,28 +51,60 @@ int clvRoomConnectionsFindConnection(ClvRoomConnections* self, const struct ClvU
 
 ClvRoomConnection* clvRoomConnectionsFindConnectionFromIndex(ClvRoomConnections* self, uint8_t connectionIndex)
 {
-    if (connectionIndex >= self->connectionCount) {
+    if (connectionIndex >= self->capacityCount) {
         return 0;
     }
 
     return &self->connections[connectionIndex];
 }
 
-ClvRoomConnection* clvRoomConnectionsFindConnectionWithMostKnowledge(ClvRoomConnections* self)
+ClvRoomConnection* clvRoomConnectionsFindConnectionWithMostKnowledge(ClvRoomConnections* self,
+                                                                     const ClvRoomConnection* excludeConnection)
 {
     CLOG_C_DEBUG(&self->log, "find connection with most knowledge. connection count: %zu", self->connectionCount)
     ClvRoomConnection* bestConnection = 0;
 
-    for (size_t i = 0; i < self->connectionCount; ++i) {
+    for (size_t i = 0; i < self->capacityCount; ++i) {
         CLOG_C_VERBOSE(&self->log, "checking connection index: %zu", i)
         ClvRoomConnection* roomConnection = &self->connections[i];
         if (roomConnection->owner == 0) {
             continue;
         }
-        if (bestConnection == 0 || roomConnection->knowledge > bestConnection->knowledge) {
+        if (roomConnection != excludeConnection &&
+            (bestConnection == 0 || roomConnection->knowledge > bestConnection->knowledge)) {
             bestConnection = roomConnection;
         }
     }
 
     return bestConnection;
+}
+
+bool clvRoomConnectionsHaveMostLostConnectionToOwner(const ClvRoomConnections* self)
+{
+    size_t votesForDisconnect = 0;
+    for (size_t i = 0; i < self->capacityCount; ++i) {
+        CLOG_C_VERBOSE(&self->log, "checking connection index: %zu", i)
+        ClvRoomConnection* roomConnection = &self->connections[i];
+        if (roomConnection->owner == 0) {
+            continue;
+        }
+        if (roomConnection->hasConnectionToOwner == ClvSerializeConnectedToOwnerStateDisconnected) {
+            votesForDisconnect++;
+        }
+    }
+
+    return (votesForDisconnect * 2) >= self->connectionCount;
+}
+
+void clvRoomConnectionsUpdate(ClvRoomConnections* self, MonotonicTimeMs now)
+{
+    for (size_t i = 0; i < self->capacityCount; ++i) {
+        CLOG_C_VERBOSE(&self->log, "checking connection index: %zu", i)
+        ClvRoomConnection* roomConnection = &self->connections[i];
+        if (roomConnection->owner == 0) {
+            continue;
+        }
+
+        clvRoomConnectionUpdate(roomConnection, now);
+    }
 }

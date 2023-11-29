@@ -22,11 +22,11 @@ int clvConnectionQualityUpdate(ClvConnectionQuality* self, MonotonicTimeMs now)
 /// @return true if the connection should be disconnected
 bool clvConnectionQualityShouldDisconnect(const ClvConnectionQuality* self)
 {
-    return self->pingsPerSecond.avgIsSet && self->pingsPerSecond.avg <= 1;
+    return self->pingsPerSecond.avgIsSet && self->pingsPerSecond.avg <= 2;
 }
 
 void clvConnectionQualityOnPing(ClvConnectionQuality* self, MonotonicTimeMs now)
 {
     self->lastPingAt = now;
-    statsIntPerSecondAdd(&self->pingsPerSecond, 2); // TODO: SHOULD BE 1
+    statsIntPerSecondAdd(&self->pingsPerSecond, 100);
 }

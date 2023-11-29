@@ -39,6 +39,8 @@ static void writePingResponse(ClvRoom* foundRoom, FldOutStream* outStream)
     }
 
     pingResponse.roomInfo.indexOfOwner = (uint8_t) indexOfOwner;
+    pingResponse.term = foundRoom->term;
+    pingResponse.version = foundRoom->version;
 
     clvSerializeServerOutPing(outStream, &pingResponse);
 }
@@ -48,7 +50,10 @@ int clvReqPing(ClvServer* self, const struct ClvUserSession* userSession, Monoto
 {
     uint64_t knowledge;
 
-    clvSerializeServerInPing(inStream, &knowledge);
+    ClvSerializeTerm term;
+    ClvSerializeConnectedToOwnerState hasConnectionToOwner;
+
+    clvSerializeServerInPing(inStream, &knowledge, &term, &hasConnectionToOwner);
 
     ClvRoomConnection* foundRoomConnection = userSession->primaryRoomConnection;
     if (foundRoomConnection == nullptr) {
@@ -56,14 +61,24 @@ int clvReqPing(ClvServer* self, const struct ClvUserSession* userSession, Monoto
         return 0;
     }
 
-    clvRoomConnectionOnPing(foundRoomConnection, knowledge, now);
     ClvRoom* room = foundRoomConnection->ownedByRoom;
+    clvRoomConnectionsUpdate(&room->roomConnections, now);
+
+    clvRoomConnectionOnPing(foundRoomConnection, knowledge, now);
+
+    if (term == room->term) {
+        foundRoomConnection->hasConnectionToOwner = hasConnectionToOwner;
+        bool shouldSelectOtherOwner = clvRoomConnectionsHaveMostLostConnectionToOwner(&room->roomConnections);
+        if (shouldSelectOtherOwner) {
+            clvRoomSelectNewOwner(room, room->ownedByConnection);
+        }
+    }
 
     clvRoomCheckForDisconnections(&self->userSessions, room);
 
     // If owner connection is disconnected or no owner is assigned
     if (room->ownedByConnection == 0 || room->ownedByConnection->owner == 0) {
-        clvRoomSelectNewOwner(room);
+        clvRoomSelectNewOwner(room, 0);
     }
 
     if (foundRoomConnection->owner == 0) {

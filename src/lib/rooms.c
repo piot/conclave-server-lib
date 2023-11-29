@@ -51,7 +51,7 @@ int clvRoomsCreate(ClvRooms* self, const ClvRoomCreateData* data, ClvRoom** outS
         if (room->createdByUserSession == 0) {
             Clog roomLog;
             roomLog.config = self->log.config;
-            tc_snprintf(room->prefix, 32, "%s/%zu", self->log.constantPrefix, i);
+            tc_snprintf(room->prefix, sizeof(room->prefix), "%s/%zu", self->log.constantPrefix, i);
             roomLog.constantPrefix = room->prefix;
 
             ClvRoomConfig config;

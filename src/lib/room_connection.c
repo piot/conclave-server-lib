@@ -13,6 +13,7 @@ void clvRoomConnectionInit(ClvRoomConnection* self, struct ClvRoom* room, const 
 {
     self->owner = userSession;
     self->ownedByRoom = room;
+    self->hasConnectionToOwner = false;
 
     clvConnectionQualityInit(&self->connectionQuality, now);
 }
@@ -20,8 +21,12 @@ void clvRoomConnectionInit(ClvRoomConnection* self, struct ClvRoom* room, const 
 void clvRoomConnectionOnPing(ClvRoomConnection* self, ClvSerializeKnowledge knowledge, MonotonicTimeMs now)
 {
     clvConnectionQualityOnPing(&self->connectionQuality, now);
-    clvConnectionQualityUpdate(&self->connectionQuality, now);
     self->knowledge = knowledge;
+}
+
+void clvRoomConnectionUpdate(ClvRoomConnection* self, MonotonicTimeMs now)
+{
+    clvConnectionQualityUpdate(&self->connectionQuality, now);
 }
 
 bool clvRoomConnectionShouldDisconnect(const ClvRoomConnection* self)

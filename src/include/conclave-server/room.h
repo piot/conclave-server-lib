@@ -32,6 +32,8 @@ typedef struct ClvRoom {
     const struct GuiseSclUserSession* createdByUserSession;
     Clog log;
     char prefix[16];
+    ClvSerializeTerm term;
+    uint64_t version;
 } ClvRoom;
 
 typedef struct ClvRoomConfig {
@@ -48,7 +50,7 @@ void clvRoomInit(ClvRoom* self, const ClvRoomConfig* config);
 int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foundUserSession, MonotonicTimeMs now,
                                 struct ClvRoomConnection** outConnection);
 void clvRoomCheckForDisconnections(struct ClvUserSessions* sessions, ClvRoom* self);
-void clvRoomSelectNewOwner(ClvRoom* self);
+void clvRoomSelectNewOwner(ClvRoom* self, const struct ClvRoomConnection* excludeConnection);
 void clvRoomDebugOutput(const ClvRoom* self);
 void clvRoomDestroy(ClvRoom* self);
 

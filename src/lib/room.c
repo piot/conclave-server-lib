@@ -39,7 +39,6 @@ void clvRoomDestroy(ClvRoom* self)
     clvRoomConnectionsDestroy(&self->roomConnections);
 }
 
-
 void clvRoomInit(ClvRoom* self, const ClvRoomConfig* config)
 {
     self->applicationId = config->applicationId;
@@ -49,6 +48,8 @@ void clvRoomInit(ClvRoom* self, const ClvRoomConfig* config)
     self->id = config->indexInRooms;
     self->ownedByConnection = 0;
     self->createdByUserSession = config->createdByUserSession;
+    self->term = 1;
+    self->version = 1;
     clvRoomConnectionsInit(&self->roomConnections, config->maxMemberCount, config->log);
 }
 
@@ -74,21 +75,25 @@ int clvRoomCreateRoomConnection(ClvRoom* self, const struct ClvUserSession* foun
         *outConnection = 0;
         return errorCode;
     }
+    self->version++;
 
     return 0;
 }
 
-void clvRoomSelectNewOwner(ClvRoom* self)
+void clvRoomSelectNewOwner(ClvRoom* self, const ClvRoomConnection* excludeConnection)
 {
     if (self->ownedByConnection == 0) {
         if (self->roomConnections.connectionCount == 0) {
             return;
         }
         self->ownedByConnection = &self->roomConnections.connections[0];
+        self->term++;
         return;
     }
 
-    self->ownedByConnection = clvRoomConnectionsFindConnectionWithMostKnowledge(&self->roomConnections);
+    self->ownedByConnection = clvRoomConnectionsFindConnectionWithMostKnowledge(&self->roomConnections,
+                                                                                excludeConnection);
+    self->term++;
 }
 
 void clvRoomCheckForDisconnections(ClvUserSessions* sessions, ClvRoom* self)
