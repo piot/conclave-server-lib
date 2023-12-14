@@ -2,16 +2,12 @@
 cmake_minimum_required(VERSION 3.16.3)
 
 add_library(conclave-server-lib STATIC 
-  connection_quality.c
   req_list_rooms.c
   req_login.c
   req_ping.c
   req_room_create.c
   req_room_join.c
   req_room_rejoin.c
-  room.c
-  room_connection.c
-  room_connections.c
   rooms.c
   server.c
   unique_id.c
@@ -25,7 +21,7 @@ target_include_directories(conclave-server-lib PUBLIC ../include)
 
 
 target_link_libraries(conclave-server-lib PUBLIC 
-  conclave-serialize
+  conclave-room-lib
   guise-session-client
   flood
   imprint

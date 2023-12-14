@@ -2,12 +2,12 @@
  *  Copyright (c) Peter Bjorklund. All rights reserved. https://github.com/piot/conclave-server-lib
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------------------*/
+#include <conclave-room/room.h>
+#include <conclave-room/room_connection.h>
 #include <conclave-serialize/commands.h>
 #include <conclave-serialize/server_in.h>
 #include <conclave-serialize/server_out.h>
 #include <conclave-server/req_ping.h>
-#include <conclave-server/room.h>
-#include <conclave-server/room_connection.h>
 #include <conclave-server/rooms.h>
 #include <conclave-server/server.h>
 #include <conclave-server/user_session.h>
@@ -79,7 +79,8 @@ int clvReqPing(ClvServer* self, const struct ClvUserSession* userSession, Monoto
         }
     }
 
-    clvRoomCheckForDisconnections(&self->userSessions, room);
+    // TODO: &self->userSessions,
+    clvRoomCheckForDisconnections(room);
 
     // If owner connection is disconnected or no owner is assigned
     if (room->ownedByConnection == 0 || room->ownedByConnection->owner == 0) {

@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16.3)
 project(conclave-server-lib C)
 
 add_subdirectory(deps/piot/clog/src/lib)
+add_subdirectory(deps/piot/conclave-room-lib/src/lib)
 add_subdirectory(deps/piot/conclave-serialize-c/src/lib)
 add_subdirectory(deps/piot/datagram-reassembly/src/lib)
 add_subdirectory(deps/piot/datagram-transport-c/src/lib)

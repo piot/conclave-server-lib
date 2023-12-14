@@ -6,7 +6,7 @@
 #define CONCLAVE_SERVER_SERVER_H
 
 #include <clog/clog.h>
-#include <conclave-server/room_connection.h>
+#include <conclave-room/room_connection.h>
 #include <conclave-server/rooms.h>
 #include <conclave-server/user_sessions.h>
 #include <guise-sessions-client/address.h>

@@ -2,12 +2,12 @@
  *  Copyright (c) Peter Bjorklund. All rights reserved. https://github.com/piot/conclave-server-lib
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------------------*/
+#include <conclave-room/room.h>
+#include <conclave-room/room_connection.h>
 #include <conclave-serialize/commands.h>
 #include <conclave-serialize/server_out.h>
 #include <conclave-server/req_room_create.h>
 #include <conclave-server/req_room_rejoin.h>
-#include <conclave-server/room.h>
-#include <conclave-server/room_connection.h>
 #include <conclave-server/rooms.h>
 #include <conclave-server/server.h>
 #include <conclave-server/user_session.h>

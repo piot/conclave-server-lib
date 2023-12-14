@@ -4,7 +4,7 @@ name = "piot/conclave-server-lib"
 version = "0.0.0"
 
 [[dependencies]]
-name = 'piot/conclave-serialize-c'
+name = 'piot/conclave-room-lib'
 version = "*"
 
 [[dependencies]]

@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See LICENSE in the project root for license information.
  *--------------------------------------------------------------------------------------------------------*/
 #include <clog/clog.h>
+#include <conclave-room/room.h>
 #include <conclave-serialize/commands.h>
 #include <conclave-serialize/debug.h>
 #include <conclave-serialize/server_out.h>
@@ -12,7 +13,6 @@
 #include <conclave-server/req_room_join.h>
 #include <conclave-server/req_room_rejoin.h>
 #include <conclave-server/req_user_login.h>
-#include <conclave-server/room.h>
 #include <conclave-server/rooms.h>
 #include <conclave-server/server.h>
 #include <conclave-server/user_session.h>
